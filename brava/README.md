@@ -1,16 +1,9 @@
 # brava
 
-A new Flutter project.
+Mobile application code for final year design (capstone) project for University of Waterloo Biomedical Engineering.
+Brava is a training load management tool for professional ballet dancers to manage overuse injuries at the ankle.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Authors:
+Jacqueline Lee (j879lee@uwaterloo.ca)
+Chantelle Ng (chantelle.ng@uwaterloo.ca)
+Caitlin Serrao (c2serrao@uwaterloo.ca)
