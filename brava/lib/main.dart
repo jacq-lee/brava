@@ -23,11 +23,11 @@ class Brava extends StatelessWidget{
       home: Scaffold(
         body: ListView(children:[
           //Loading(),
-          //Home(),
+          Home(),
           //Camera(),
           // Limits(),
           // Stats(),
-          Stats2(),
+          // Stats2(),
         ]),
       ),
     );
