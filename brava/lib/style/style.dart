@@ -6,6 +6,7 @@ const bravaPink = Color(0xFFFE6E93);
 const lightPink = Color(0xFFFFDEEA);
 const lightestPink = Color(0xFFFFFAFB);
 const queenPink = Color(0xFFEF3A69);
+const lightGrey = Color(0xFFF3F2F2);
 const dirtyDuckGrey = Color(0xFFCDC1C1);
 const stagePink = Color(0xFF390A17);
 const marleyBlack = Color(0xFF131214);
@@ -18,7 +19,7 @@ final bravaAppTheme = ThemeData(
   // Define the default text styling for headlines, titles, bodies of
   // text, etc.
   fontFamily: 'Figtree',
-  // textTheme: TextTheme(
+  textTheme: TextTheme(
   //   displayLarge: GoogleFonts.figtree(),
   //   displayMedium: GoogleFonts.figtree(),
   //   displaySmall: GoogleFonts.figtree(),
@@ -29,12 +30,14 @@ final bravaAppTheme = ThemeData(
   //   titleMedium: GoogleFonts.figtree(),
   //   titleSmall: GoogleFonts.figtree(),
   //   bodyLarge: GoogleFonts.figtree(),
-  //   bodyMedium: GoogleFonts.figtree(),
+    bodyMedium: GoogleFonts.figtree(
+      fontSize: 16,
+    ),
   //   bodySmall: GoogleFonts.figtree(),
   //   labelLarge: GoogleFonts.figtree(),
   //   labelMedium: GoogleFonts.figtree(),
   //   labelSmall: GoogleFonts.figtree(),
-  // ),
+  ),
   navigationBarTheme: NavigationBarThemeData(
     backgroundColor: Colors.white,
     indicatorColor: lightPink,

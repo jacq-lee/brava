@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:brava/style/style.dart';
 import 'screens/loading.dart';
 import 'screens/home.dart';
@@ -21,23 +20,44 @@ class Brava extends StatelessWidget{
     return MaterialApp(
       title: 'Brava',
       theme: bravaAppTheme,
-      home: Scaffold(
-        // body: Center(child: Loading()),
-        body: Center(child: Home()),
-        // body: Center(child: Camera()),
-        // body: Center(child: Limits()),
-        // body: Center(child: Stats()),
-        // body: Center(child: Stats2()),
-        bottomNavigationBar: NavigationBar(
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-            NavigationDestination(icon: Icon(Icons.list), label: "Training"),
-            NavigationDestination(icon: Icon(Icons.bar_chart), label: "Stats"),
-            NavigationDestination(icon: Icon(Icons.camera), label: "Camera"),
-          ],
-        ),
-      ),
+      home: const BravaScreen(),
     );
   }
 }
 
+
+class BravaScreen extends StatefulWidget {
+  const BravaScreen({super.key});
+
+  @override
+  State<BravaScreen> createState() => _BravaScreenState();
+}
+
+class _BravaScreenState extends State<BravaScreen> {
+  int currentPageIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body:
+      <Widget>[Home(), Camera(), Limits(), Stats()][currentPageIndex],
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentPageIndex = index;
+          });
+        },
+        selectedIndex: currentPageIndex,
+        destinations: const <Widget>[
+          NavigationDestination(icon: Icon(Icons.home_outlined), label: "Home"),
+          NavigationDestination(icon: Icon(Icons.linked_camera_outlined), label: "Camera"),
+          NavigationDestination(icon: Icon(Icons.assignment_outlined), label: "Training"),
+          // NavigationDestination(icon: Icon(Icons.task_alt), label: "Training"),
+          // NavigationDestination(icon: Icon(Icons.rocket_launch_outlined), label: "Training"),
+          // NavigationDestination(icon: Icon(Icons.fitness_center_outlined), label: "Training"),
+          NavigationDestination(icon: Icon(Icons.insights), label: "Stats"),
+        ],
+      ),
+    );
+  }
+}
