@@ -1,12 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:brava_app/style/colors.dart';
 
-class Limits extends StatefulWidget {
+import 'package:brava/style/style.dart';
+import 'package:brava/widgets/widgets.dart';
+
+
+class Limits extends StandardPage {
+  const Limits({super.key});
+
   @override
-  _LimitsState createState() => _LimitsState();
+  String getPageTitle() {
+    return "Training Load Limits";
+  }
+
+  @override
+  Widget getContentWidget() {
+    return LimitsContent();
+  }
 }
 
-class _LimitsState extends State<Limits> {
+
+class LimitsContent extends StatefulWidget {
+  @override
+  _LimitsContentState createState() => _LimitsContentState();
+}
+
+class _LimitsContentState extends State<LimitsContent> {
   List<Widget> limitCards = [];
   List<Widget> previousLimitCards = [];
   final ScrollController _scrollController = ScrollController();
@@ -48,73 +66,52 @@ class _LimitsState extends State<Limits> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      height: MediaQuery.of(context).size.height,
-      padding: EdgeInsets.symmetric(horizontal: 31),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 50),
-          Text(
-            'Training Load Limits',
-            style: TextStyle(
-              color: Color(0xFF131214),
-              fontSize: 16,
-              fontFamily: 'Figtree',
-              fontWeight: FontWeight.w700,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Current Limit',
+          style: TextStyle(
+            color: Color(0xFF131214),
+            fontSize: 16,
+            fontFamily: 'Figtree',
+            fontWeight: FontWeight.w400,
           ),
-          SizedBox(height: 10),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              border: Border.all(width: 1, color: BravaColors.bravaPink),
-            ),
-            child: SizedBox(width: double.infinity, height: 1),
+        ),
+        SizedBox(height: 8),
+        Align(
+          alignment: AlignmentDirectional.topCenter,
+          child: ElevatedButton(
+            onPressed: addNewLimitCard,
+            child: Text("Add Training Limit"),
           ),
-          SizedBox(height: 10),
-          Text(
-            'Current Limit',
-            style: TextStyle(
-              color: Color(0xFF131214),
-              fontSize: 16,
-              fontFamily: 'Figtree',
-              fontWeight: FontWeight.w400,
-            ),
+        ),
+        SizedBox(height: 8,),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.all(0),
+            controller: _scrollController,
+            children: limitCards,
           ),
-          SizedBox(height: 10),
-          Container(
-            alignment: Alignment.center,
-            child: ElevatedButton(
-              onPressed: addNewLimitCard,
-              child: Text("Add Training Limit"),
-            ),
+        ),
+        SizedBox(height: 20),
+        Text(
+          'Previous Limits',
+          style: TextStyle(
+            color: Color(0xFF131214),
+            fontSize: 16,
+            fontFamily: 'Figtree',
+            fontWeight: FontWeight.w400,
           ),
-          SizedBox(
-            height: 300,
-            child: ListView(
-              controller: _scrollController,
-              children: limitCards,
-            ),
+        ),
+        SizedBox(height: 8,),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.all(0),
+            children: previousLimitCards,
           ),
-          SizedBox(height: 20),
-          Text(
-            'Previous Limits',
-            style: TextStyle(
-              color: Color(0xFF131214),
-              fontSize: 16,
-              fontFamily: 'Figtree',
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          SizedBox(
-            height: 300,
-            child: ListView(
-              children: previousLimitCards,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -171,7 +168,7 @@ class TrainingLimitCard extends StatelessWidget {
               ),
               Row(
                 children: [
-                  SizedBox(width: 10),
+                  SizedBox(width: 8),
                   SizedBox(
                     width: 40,
                     child: PercentageSelector(
@@ -194,6 +191,7 @@ class TrainingLimitCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     'Notes',
@@ -204,7 +202,7 @@ class TrainingLimitCard extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  SizedBox(width: 55),
+                  SizedBox(width: 54),
                   SizedBox(
                     child: IconButton(
                       icon: Icon(Icons.archive_outlined, color: BravaColors.stagePink),
@@ -214,7 +212,7 @@ class TrainingLimitCard extends StatelessWidget {
                 ],
               ),
               SizedBox(
-                width: 139,
+                width: 125,
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   child: TextField(
