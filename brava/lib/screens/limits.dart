@@ -1,884 +1,297 @@
 import 'package:flutter/material.dart';
+import 'package:brava_app/style/colors.dart';
 
-class Limits extends StatelessWidget {
+class Limits extends StatefulWidget {
+  @override
+  _LimitsState createState() => _LimitsState();
+}
+
+class _LimitsState extends State<Limits> {
+  List<Widget> limitCards = [];
+  List<Widget> previousLimitCards = [];
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void addNewLimitCard() {
+    setState(() {
+      limitCards.add(
+        TrainingLimitCard(
+          title: "Training Period",
+          onPercentage1Changed: (value) {},
+          onPercentage2Changed: (value) {},
+          onArchive: (card) => archiveCard(card),
+        ),
+      );
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  void archiveCard(Widget card) {
+    setState(() {
+      limitCards.remove(card);
+      previousLimitCards.add(card);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 393,
-          height: 852,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(color: Colors.white),
-          child: Stack(
+    return Container(
+      color: Colors.white,
+      height: MediaQuery.of(context).size.height,
+      padding: EdgeInsets.symmetric(horizontal: 31),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 50),
+          Text(
+            'Training Load Limits',
+            style: TextStyle(
+              color: Color(0xFF131214),
+              fontSize: 16,
+              fontFamily: 'Figtree',
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(height: 10),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: BravaColors.bravaPink),
+            ),
+            child: SizedBox(width: double.infinity, height: 1),
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Current Limit',
+            style: TextStyle(
+              color: Color(0xFF131214),
+              fontSize: 16,
+              fontFamily: 'Figtree',
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          SizedBox(height: 10),
+          Container(
+            alignment: Alignment.center,
+            child: ElevatedButton(
+              onPressed: addNewLimitCard,
+              child: Text("Add Training Limit"),
+            ),
+          ),
+          SizedBox(
+            height: 300,
+            child: ListView(
+              controller: _scrollController,
+              children: limitCards,
+            ),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Previous Limits',
+            style: TextStyle(
+              color: Color(0xFF131214),
+              fontSize: 16,
+              fontFamily: 'Figtree',
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          SizedBox(
+            height: 300,
+            child: ListView(
+              children: previousLimitCards,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TrainingLimitCard extends StatelessWidget {
+  final String title;
+  final Function(String) onPercentage1Changed;
+  final Function(String) onPercentage2Changed;
+  final Function(Widget) onArchive;
+
+  const TrainingLimitCard({
+    super.key,
+    required this.title,
+    required this.onPercentage1Changed,
+    required this.onPercentage2Changed,
+    required this.onArchive,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: BravaColors.lightestPink,
+        borderRadius: BorderRadius.circular(9),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Positioned(
-                left: 31,
-                top: 49,
-                child: Text(
-                  'Training Load Limit Log',
+              SizedBox(
+                width: 150,
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: title,
+                    hintStyle: TextStyle(
+                      color: BravaColors.stagePink,
+                      fontSize: 12,
+                      fontFamily: 'Figtree',
+                      fontWeight: FontWeight.w700,
+                    ),
+                    border: InputBorder.none,
+                  ),
                   style: TextStyle(
-                    color: Color(0xFF131214),
-                    fontSize: 16,
+                    color: BravaColors.stagePink,
+                    fontSize: 12,
                     fontFamily: 'Figtree',
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-              Positioned(
-                left: 31,
-                top: 94,
-                child: Text(
-                  'Current Limit',
-                  style: TextStyle(
-                    color: Color(0xFF131214),
-                    fontSize: 16,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 22,
-                top: 778,
-                child: Container(
-                  width: 350,
-                  height: 50,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 350,
-                          height: 50,
-                          decoration: ShapeDecoration(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(width: 0.50, color: Color(0xFFE7E7E7)),
-                              borderRadius: BorderRadius.circular(34),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 34,
-                        top: 13,
-                        child: Container(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            spacing: 43,
-                            children: [
-                              Container(
-                                width: 20,
-                                height: 20,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage("https://placehold.co/20x20"),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage("https://placehold.co/24x24"),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage("https://placehold.co/24x24"),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 22,
-                                height: 22,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage("https://placehold.co/22x22"),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Container(width: 20, height: 20, child: Stack()),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: 76,
-                child: Container(
-                  width: 393,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        width: 1,
-                        strokeAlign: BorderSide.strokeAlignCenter,
-                        color: Color(0xFFFFF9FB),
-                      ),
+              Row(
+                children: [
+                  SizedBox(width: 10),
+                  SizedBox(
+                    width: 40,
+                    child: PercentageSelector(
+                      onValueChanged: onPercentage1Changed,
                     ),
                   ),
-                ),
-              ),
-              Positioned(
-                left: 25,
-                top: 266,
-                child: Container(
-                  width: 349,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        width: 1,
-                        strokeAlign: BorderSide.strokeAlignCenter,
-                        color: Color(0xFFFFF9FB),
-                      ),
+                  SizedBox(width: 20),
+                  SizedBox(
+                    width: 80,
+                    child: PercentageSelector(
+                      onValueChanged: onPercentage2Changed,
                     ),
                   ),
-                ),
+                ],
               ),
-              Positioned(
-                left: 32,
-                top: 121,
-                child: Container(
-                  width: 328,
-                  height: 83,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+            ],
+          ),
+          SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'Notes',
+                    style: TextStyle(
+                      color: BravaColors.stagePink,
+                      fontSize: 12,
+                      fontFamily: 'Figtree',
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 328,
-                          height: 83,
-                          decoration: ShapeDecoration(
-                            color: Color(0xFFFFF9FB),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 175,
-                        top: 24,
-                        child: SizedBox(
-                          width: 120,
-                          height: 50,
-                          child: Text(
-                            'Preparing for symposium, don’t want to aggravate...',
-                            style: TextStyle(
-                              color: Color(0xFF131214),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 14,
-                        top: 8.57,
-                        child: Text(
-                          'Symposium Prep',
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 12,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 15,
-                        top: 25,
-                        child: Text(
-                          'Mar 1, 2025 - Mar 19, 2025',
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 10,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 22,
-                        top: 49,
-                        child: Text(
-                          '80%',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 16,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 107,
-                        top: 49,
-                        child: Text(
-                          '95%',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 16,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 175,
-                        top: 11.22,
-                        child: SizedBox(
-                          width: 44,
-                          height: 12,
-                          child: Text(
-                            'Notes',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  SizedBox(width: 55),
+                  SizedBox(
+                    child: IconButton(
+                      icon: Icon(Icons.archive_outlined, color: BravaColors.stagePink),
+                      onPressed: () => onArchive(this),
+                    ),
                   ),
-                ),
+                ],
               ),
-              Positioned(
-                left: 60,
-                top: 239,
-                child: Text(
-                  'Previous Limits',
-                  style: TextStyle(
-                    color: Color(0xFF131214),
-                    fontSize: 16,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 32,
-                top: 378,
-                child: Container(
-                  width: 328,
-                  height: 83,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 328,
-                          height: 83,
-                          decoration: ShapeDecoration(
-                            color: Color(0xFFFFF9FB),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                          ),
-                        ),
+              SizedBox(
+                width: 139,
+                child: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: TextField(
+                    maxLines: 3,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      hintText: 'Enter your training diary here.',
+                      hintStyle: TextStyle(
+                        color: Color(0xFF390A17),
+                        fontSize: 12,
+                        fontFamily: 'Figtree',
+                        fontWeight: FontWeight.w400,
                       ),
-                      Positioned(
-                        left: 175,
-                        top: 24,
-                        child: SizedBox(
-                          width: 114,
-                          height: 50,
-                          child: Text(
-                            'Physio told me to take it easy during the Mouse King ...',
-                            style: TextStyle(
-                              color: Color(0xFF131214),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 14,
-                        top: 10.57,
-                        child: SizedBox(
-                          width: 125,
-                          height: 11.38,
-                          child: Text(
-                            'Nutcracker Rehearsals',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 15,
-                        top: 25,
-                        child: Text(
-                          'Dec 5, 2024 - Dec 10, 2024 ',
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 10,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 23,
-                        top: 49,
-                        child: SizedBox(
-                          width: 33,
-                          height: 15.45,
-                          child: Text(
-                            '50%',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 16,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 106,
-                        top: 49,
-                        child: SizedBox(
-                          width: 34,
-                          height: 15.45,
-                          child: Text(
-                            '80%',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 16,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 175,
-                        top: 11.22,
-                        child: SizedBox(
-                          width: 44,
-                          height: 12,
-                          child: Text(
-                            'Notes',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 32,
-                top: 280,
-                child: Container(
-                  width: 328,
-                  height: 83,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 328,
-                          height: 83,
-                          decoration: ShapeDecoration(
-                            color: Color(0xFFFFF9FB),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 175,
-                        top: 24,
-                        child: SizedBox(
-                          width: 114,
-                          height: 50,
-                          child: Text(
-                            'Ankle feeling really good, want to safely strengthen now.',
-                            style: TextStyle(
-                              color: Color(0xFF131214),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 14,
-                        top: 8.57,
-                        child: Text(
-                          'New Year Strengthening',
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 12,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 15,
-                        top: 25,
-                        child: Text(
-                          'Jan 5, 2025 - Feb 5, 2025',
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 10,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 23,
-                        top: 49,
-                        child: SizedBox(
-                          width: 33,
-                          height: 15.45,
-                          child: Text(
-                            '60%',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 16,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 105,
-                        top: 49,
-                        child: Text(
-                          '110%',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 16,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 175,
-                        top: 11.22,
-                        child: SizedBox(
-                          width: 44,
-                          height: 12,
-                          child: Text(
-                            'Notes',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 32,
-                top: 672,
-                child: Container(
-                  width: 328,
-                  height: 83,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 328,
-                          height: 83,
-                          decoration: ShapeDecoration(
-                            color: Color(0xFFFFF9FB),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 175,
-                        top: 24,
-                        child: SizedBox(
-                          width: 114,
-                          height: 50,
-                          child: Text(
-                            'Slowly increasing training load after vacation.',
-                            style: TextStyle(
-                              color: Color(0xFF131214),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 14,
-                        top: 10.57,
-                        child: SizedBox(
-                          width: 125,
-                          height: 11.38,
-                          child: Text(
-                            'Vacation Return',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 15,
-                        top: 25,
-                        child: Text(
-                          'Oct 18, 2024 - Oct 25, 2024 ',
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 10,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 23,
-                        top: 49,
-                        child: SizedBox(
-                          width: 33,
-                          height: 15.45,
-                          child: Text(
-                            '50%',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 16,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 103,
-                        top: 49,
-                        child: Text(
-                          '100%',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 16,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 175,
-                        top: 11.22,
-                        child: SizedBox(
-                          width: 44,
-                          height: 12,
-                          child: Text(
-                            'Notes',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 32,
-                top: 574,
-                child: Container(
-                  width: 328,
-                  height: 83,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 328,
-                          height: 83,
-                          decoration: ShapeDecoration(
-                            color: Color(0xFFFFF9FB),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 14,
-                        top: 10.57,
-                        child: SizedBox(
-                          width: 125,
-                          height: 11.38,
-                          child: Text(
-                            'Technique Classes',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 15,
-                        top: 25,
-                        child: Text(
-                          'Nov 6, 2024 - Nov 12, 2024 ',
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 10,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 62,
-                        top: 49,
-                        child: SizedBox(
-                          width: 33,
-                          height: 15.45,
-                          child: Text(
-                            '60%',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 16,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 175,
-                        top: 35,
-                        child: Text(
-                          'No notes',
-                          style: TextStyle(
-                            color: Color(0xFFCDC0C0),
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 32,
-                top: 476,
-                child: Container(
-                  width: 328,
-                  height: 83,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 328,
-                          height: 83,
-                          decoration: ShapeDecoration(
-                            color: Color(0xFFFFF9FB),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 175,
-                        top: 24,
-                        child: SizedBox(
-                          width: 114,
-                          height: 50,
-                          child: Text(
-                            'Ankle feeling better so all clear to start ramping up!',
-                            style: TextStyle(
-                              color: Color(0xFF131214),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 14,
-                        top: 10.57,
-                        child: SizedBox(
-                          width: 125,
-                          height: 11.38,
-                          child: Text(
-                            'Choreo Weeks',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 15,
-                        top: 25,
-                        child: Text(
-                          'Nov 23, 2024 - Dec 3, 2024 ',
-                          style: TextStyle(
-                            color: Color(0xFF390A17),
-                            fontSize: 10,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 23,
-                        top: 46,
-                        child: SizedBox(
-                          width: 33,
-                          height: 15.45,
-                          child: Text(
-                            '20%',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 16,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 106,
-                        top: 46,
-                        child: SizedBox(
-                          width: 34,
-                          height: 15.45,
-                          child: Text(
-                            '40%',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 16,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 175,
-                        top: 11.22,
-                        child: SizedBox(
-                          width: 44,
-                          height: 12,
-                          child: Text(
-                            'Notes',
-                            style: TextStyle(
-                              color: Color(0xFF390A17),
-                              fontSize: 12,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 349,
-                top: 245,
-                child: Container(
-                  width: 13,
-                  height: 8,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(width: 13, height: 8, child: Stack()),
-                      ),
-                    ],
+                      border: InputBorder.none,
+                    ),
+                    style: TextStyle(
+                      color: BravaColors.stagePink,
+                      fontSize: 12,
+                      fontFamily: 'Figtree',
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class PercentageSelector extends StatefulWidget {
+  final Function(String) onValueChanged;
+
+  PercentageSelector({required this.onValueChanged});
+
+  @override
+  _PercentageSelectorState createState() => _PercentageSelectorState();
+}
+
+class _PercentageSelectorState extends State<PercentageSelector> {
+  int selectedIndex = 0;
+  final List<String> percentages = ['-', '0%','10%','20%','30%','40%','50%','60%', '70%', '80%', '90%', '100%','110%','120%','130%'];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 30,
+      child: ListWheelScrollView.useDelegate(
+        controller: FixedExtentScrollController(initialItem: selectedIndex),
+        itemExtent: 28,
+        physics: FixedExtentScrollPhysics(),
+        onSelectedItemChanged: (index) {
+          setState(() {
+            selectedIndex = index;
+          });
+          widget.onValueChanged(percentages[index]);
+        },
+        childDelegate: ListWheelChildBuilderDelegate(
+          childCount: percentages.length,
+          builder: (context, index) {
+            return Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                percentages[index],
+                style: TextStyle(
+                  color: BravaColors.stagePink,
+                  fontSize: 16,
+                  fontFamily: 'Figtree',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            );
+          },
         ),
-      ],
+      ),
     );
   }
 }
