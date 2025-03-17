@@ -36,12 +36,22 @@ final bravaAppTheme = ThemeData(
   //   titleSmall: GoogleFonts.figtree(),
   //   bodyLarge: GoogleFonts.figtree(),
     bodyMedium: GoogleFonts.figtree(
+      // Usage: Default body text.
       fontSize: 16,
     ),
   //   bodySmall: GoogleFonts.figtree(),
-  //   labelLarge: GoogleFonts.figtree(),
-  //   labelMedium: GoogleFonts.figtree(),
-  //   labelSmall: GoogleFonts.figtree(),
+    labelLarge: GoogleFonts.figtree(
+      // Usage: e.g. bolded text on buttons or interactive elements.
+      fontWeight: FontWeight.w700,
+    ),
+    labelMedium: GoogleFonts.figtree(
+      // Usage: Standard small subtitle font.
+      fontWeight: FontWeight.w300,  // Not applying for some reason.
+    ),
+    labelSmall: GoogleFonts.figtree(
+      // Usage: Smallest subtitle font.
+      fontWeight: FontWeight.w300,  // Not applying for some reason.
+    ),
   ),
   navigationBarTheme: NavigationBarThemeData(
     backgroundColor: Colors.white,

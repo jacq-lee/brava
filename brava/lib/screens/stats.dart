@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:expandable/expandable.dart';
 
 import 'package:brava/style/style.dart';
 import 'package:brava/widgets/widgets.dart';
@@ -20,14 +21,15 @@ class Stats extends StandardPage {
         SizedBox(height: 8,),
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: dirtyDuckGrey.withAlpha(80), width: 2,),
+            border: Border.all(color: BravaColors.dirtyDuckGrey.withAlpha(80), width: 2,),
             borderRadius: BorderRadius.all(Radius.circular(10),),
           ),
-          child: SizedBox(width: 400, height: 300,),
+          // child: SizedBox(width: 400, height: 300,),
+          child: MovementProgressExpandable(movementLabel: "Total",),
           // child: ListView(
           //   padding: EdgeInsets.all(8),
           //   children: <Widget>[
-          //
+          //     EventPhotos(),
           //   ],
           // ),
         ),
@@ -56,7 +58,7 @@ class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
         Text(
           timeScales[i],
           style: Theme.of(context).textTheme.labelLarge!.copyWith(
-              color: stagePink, fontWeight: FontWeight.w700
+              color: BravaColors.stagePink,
           ),
         ),
     ];
@@ -64,7 +66,7 @@ class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: lightestPink,
+        color: BravaColors.lightestPink,
         borderRadius: BorderRadius.all(Radius.circular(height/2,),),
       ),
       child: ToggleButtons(
@@ -78,9 +80,9 @@ class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
           });
         },
         borderRadius: const BorderRadius.all(Radius.circular(height/2)),
-        color: stagePink,
-        selectedColor: stagePink,
-        fillColor: lightPink,
+        color: BravaColors.stagePink,
+        selectedColor: BravaColors.stagePink,
+        fillColor: BravaColors.lightPink,
         borderColor: Colors.transparent,
         selectedBorderColor: Colors.transparent,
         splashColor: Colors.transparent,
@@ -93,7 +95,7 @@ class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
 }
 
 
-// class MovementProgressBarsCard extends StatelessWidget {
+// class MovementProgressExpandable extends StatelessWidget {
 //   const MovementProgressBarsCard({super.key});
 //
 //   @override
@@ -110,6 +112,112 @@ class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
 //   }
 // }
 
+class MovementProgressExpandable extends StatelessWidget {
+  const MovementProgressExpandable({super.key, required this.movementLabel});
+
+  final String movementLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget constantHeader = Column(
+      children: [
+        Row(
+          children: [
+            Text(
+              movementLabel,
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: BravaColors.stagePink, fontWeight: FontWeight.w700,
+              ),
+            ),
+            Icon(Icons.help_center_outlined, color: BravaColors.bravaPink,),
+            Expanded(child: SizedBox(),),
+          ],
+        ),
+        ProgressBar(label: "Average"),
+      ],
+    );
+
+    return ExpandableNotifier(  // <-- Provides ExpandableController to its children
+      child: Container(
+        decoration: BoxDecoration(
+          color: BravaColors.lightestPink,
+          borderRadius: BorderRadius.all(Radius.circular(10,),),
+        ),
+        child: Column(  // Maybe delete column if not being used.
+          children: [
+            Expandable(           // <-- Driven by ExpandableController from ExpandableNotifier
+              collapsed: ExpandableButton(  // <-- Expands when tapped on the cover photo
+                child: constantHeader,
+              ),
+              expanded: Column(
+                  children: [
+                    constantHeader,
+                    Text("omg hey again"),
+                    ExpandableButton(       // <-- Collapses when tapped on
+                      child: Text("Back"),
+                    ),
+                  ]
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProgressBar extends StatelessWidget {
+  const ProgressBar({super.key, this.label=""});
+
+  final String label;
+  final double barHeight = 10.0;
+
+  @override
+  Widget build(BuildContext context) {
+    Color backgroundColor = BravaColors.lightPink;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: backgroundColor, width: 2,),
+                  borderRadius: BorderRadius.all(Radius.circular(20,),),
+                ),
+                child: LinearProgressIndicator(
+                  value: 0.76,
+                  color: backgroundColor,
+                  valueColor: AlwaysStoppedAnimation(BravaColors.bravaPink),
+                  minHeight: barHeight,
+                  borderRadius: BorderRadius.all(Radius.circular(barHeight/2),),
+                  trackGap: 2,
+                ),
+              ),
+            ),
+            SizedBox(width: 12,),
+            Container(
+              constraints: BoxConstraints(minWidth: 20,),
+              child: Text(
+                "76%",
+                style: Theme.of(context).textTheme.labelLarge!.copyWith(color: BravaColors.bravaPink, fontWeight: FontWeight.w900,),
+              )
+            ),
+          ],
+        ),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelLarge!.copyWith(color: BravaColors.stagePink, fontWeight: FontWeight.w300,),
+        )
+      ],
+    );
+  }
+}
+
 
 
 // FUNCTIONAL, GPT -------------------------------------------------------------
@@ -123,7 +231,7 @@ class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
 //     return Container(
 //       // padding: const EdgeInsets.all(4),
 //       decoration: BoxDecoration(
-//         color: lightestPink,
+//         color: BravaColors.lightestPink,
 //         borderRadius: BorderRadius.circular(30),
 //       ),
 //       child: Row(
@@ -139,13 +247,13 @@ class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
 //             child: Container(
 //               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
 //               decoration: BoxDecoration(
-//                 color: isSelected ? lightPink : Colors.transparent,
+//                 color: isSelected ? BravaColors.lightPink : Colors.transparent,
 //                 borderRadius: BorderRadius.circular(30),
 //               ),
 //               child: Text(
 //                 labels[index],
 //                 style: Theme.of(context).textTheme.labelLarge!.copyWith(
-//                   color: stagePink,
+//                   color: BravaColors.stagePink,
 //                   fontWeight: FontWeight.w700,
 //                 )
 //               ),
