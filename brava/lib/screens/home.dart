@@ -46,15 +46,15 @@ class TlProgressIndicator extends StatelessWidget {
           height: 280,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: lightestPink,
+            color: BravaColors.lightestPink,
             border: Border.all(color: Color(0xFFFCF3F6), width: 2,),
           ),
         ),
         CircularProgressIndicator(
           constraints: BoxConstraints(minWidth: 300, minHeight: 300),
           value: 0.76,
-          valueColor: AlwaysStoppedAnimation(bravaPink),
-          backgroundColor: lightGrey,
+          valueColor: AlwaysStoppedAnimation(BravaColors.bravaPink),
+          backgroundColor: BravaColors.lightGrey,
           strokeWidth: 8,
           strokeCap: StrokeCap.round,
         ),
@@ -68,7 +68,7 @@ class TlProgressIndicator extends StatelessWidget {
               ),
             ),
             SizedBox(height: 4),
-            Text("of Daily Training\nLoad Limit", textAlign: TextAlign.center, style: TextStyle(color: stagePink, fontWeight: FontWeight.w500),),
+            Text("of Daily Training\nLoad Limit", textAlign: TextAlign.center, style: TextStyle(color: BravaColors.stagePink, fontWeight: FontWeight.w500),),
           ],
         )
       ],
