@@ -1,1086 +1,77 @@
 import 'package:flutter/material.dart';
+import 'package:expandable/expandable.dart';
 
-class Stats extends StatelessWidget {
+import 'package:brava/style/style.dart';
+import 'package:brava/widgets/widgets.dart';
+
+
+class Stats extends StandardPage {
+  const Stats({super.key});
+
   @override
-  Widget build(BuildContext context) {
+  String getPageTitle() {
+    return "Training Load History";
+  }
+
+  @override
+  Widget getContentWidget() {
     return Column(
       children: [
-        Container(
-          width: 393,
-          height: 852,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(color: Colors.white),
-          child: Stack(
-            children: [
-              Positioned(
-                left: 27,
-                top: 131,
-                child: Container(
-                  width: 340,
-                  height: 631,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 1, color: Color(0xFFF3F2F2)),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 32,
-                top: 632,
-                child: Container(
-                  width: 330,
-                  height: 123,
-                  decoration: ShapeDecoration(
-                    color: Color(0xFFFFF9FB),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 250,
-                top: 639,
-                child: Container(
-                  width: 42,
-                  height: 20,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-                  decoration: ShapeDecoration(
-                    color: Color(0xFFFFDEEA),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(31),
-                    ),
+        // Toggle for Daily / Weekly / Monthly / Yearly breakdown.
+        ToggleButtonsTimeScale(),
+        SizedBox(height: 8,),
+        // Box containing the breakdown.
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: BravaColors.dirtyDuckGrey.withAlpha(80), width: 2,),
+              borderRadius: BorderRadius.all(Radius.circular(10),),
+            ),
+            padding: EdgeInsets.all(8),
+            child:
+            Column(
+              children: [
+                // Header displaying date.
+                Container(
+                  decoration: BoxDecoration(
+                    color: BravaColors.lightestPink,
+                    borderRadius: BorderRadius.all(Radius.circular(10),),
                   ),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    spacing: 10,
                     children: [
-                      Text(
-                        'Edit',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFF390A17),
-                          fontSize: 10,
-                          fontFamily: 'Figtree',
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 32,
-                top: 136,
-                child: Container(
-                  width: 330,
-                  height: 47,
-                  decoration: ShapeDecoration(
-                    color: Color(0xFFFFF9FB),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 32,
-                top: 301,
-                child: Container(
-                  width: 330,
-                  height: 141,
-                  decoration: ShapeDecoration(
-                    color: Color(0xFFFFF9FB),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 32,
-                top: 452,
-                child: Container(
-                  width: 330,
-                  height: 172,
-                  decoration: ShapeDecoration(
-                    color: Color(0xFFFFF9FB),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 52,
-                top: 680,
-                child: Text(
-                  '1.',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 12,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 52,
-                top: 740,
-                child: Text(
-                  '2. ',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 12,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 72,
-                top: 680,
-                child: SizedBox(
-                  width: 203,
-                  child: Text(
-                    'For how many minutes do you have stiffness in the Achilles region on first getting up?',
-                    style: TextStyle(
-                      color: Color(0xFF390A17),
-                      fontSize: 12,
-                      fontFamily: 'Figtree',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 72,
-                top: 740,
-                child: Text(
-                  'Once you are warmed up for the day,',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 12,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 32,
-                top: 228,
-                child: Container(
-                  width: 330,
-                  height: 64,
-                  decoration: ShapeDecoration(
-                    color: Color(0xFFFFF9FB),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 27,
-                top: 90,
-                child: Container(
-                  width: 340,
-                  height: 34,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 340,
-                          height: 34,
-                          decoration: ShapeDecoration(
-                            color: Color(0xFFFFF9FB),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(33),
-                            ),
+                      Icon(Icons.arrow_left_rounded, color: BravaColors.bravaPink, size: 48,),
+                      // Current Date Button.
+                      Expanded(
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: BravaColors.lightestPink,
+                            foregroundColor: BravaColors.stagePink,
                           ),
+                          onPressed: () {},
+                          child: Text("Mar 20, 2024"),
                         ),
                       ),
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 72.26,
-                          height: 34,
-                          decoration: ShapeDecoration(
-                            color: Color(0xFFFFDEEA),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(27),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 4.63,
-                        top: 0,
-                        child: Container(
-                          width: 331.66,
-                          height: 34,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            spacing: 50,
-                            children: [
-                              Text(
-                                'Daily',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFF390A17),
-                                  fontSize: 12,
-                                  fontFamily: 'Figtree',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                'Weekly',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFF390A17),
-                                  fontSize: 12,
-                                  fontFamily: 'Figtree',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                'Monthly',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFF390A17),
-                                  fontSize: 12,
-                                  fontFamily: 'Figtree',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                'Yearly',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFF390A17),
-                                  fontSize: 12,
-                                  fontFamily: 'Figtree',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      Icon(Icons.arrow_right_rounded, color: BravaColors.bravaPink, size: 48,),
                     ],
                   ),
                 ),
-              ),
-              Positioned(
-                left: 271,
-                top: 195,
-                child: Container(
-                  width: 92,
-                  height: 23,
-                  decoration: ShapeDecoration(
-                    color: Color(0xFFFFF9FB),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(33),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 314,
-                top: 195,
-                child: Container(
-                  width: 49,
-                  height: 23,
-                  decoration: ShapeDecoration(
-                    color: Color(0xFFFFDEEA),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(27),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 280.63,
-                top: 200.50,
-                child: Text(
-                  'Count',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 10,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 336.19,
-                top: 200.50,
-                child: Text(
-                  '%',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 10,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 31,
-                top: 49,
-                child: Text(
-                  'Training Load History',
-                  style: TextStyle(
-                    color: Color(0xFF131214),
-                    fontSize: 16,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 154,
-                top: 152,
-                child: Text(
-                  'Mar 20, 2025',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 14,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 41,
-                top: 237,
-                child: Text(
-                  'Total',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 12,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 327,
-                top: 263,
-                child: Text(
-                  '76%',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: Color(0xFFFD6D93),
-                    fontSize: 12,
-                    fontFamily: 'Archivo',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 75,
-                top: 238,
-                child: Container(
-                  width: 12,
-                  height: 12,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 12,
-                          height: 12,
-                          decoration: ShapeDecoration(
-                            shape: OvalBorder(
-                              side: BorderSide(width: 1, color: Color(0xFFFFDEEA)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 3,
-                        top: 2,
-                        child: SizedBox(
-                          width: 6,
-                          child: Text(
-                            '?',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFFFFDEEA),
-                              fontSize: 8,
-                              fontFamily: 'Archivo',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
+                SizedBox(height: 8,),
+                // Toggle between percentage and count.
+                Align(alignment: AlignmentDirectional.centerEnd, child: ToggleButtonsUnits(),),
+                SizedBox(height: 8,),
+                // Scrollable area for the rest of the breakdown.
+                Expanded(
+                  child: ListView(
+                    padding: EdgeInsets.all(0),
+                    children: <Widget>[
+                      MovementProgressExpandable(movementLabel: "Total",),
+                      SizedBox(height: 8,),
+                      VisaAExpandable(),
                     ],
                   ),
                 ),
-              ),
-              Positioned(
-                left: 22,
-                top: 778,
-                child: Container(
-                  width: 350,
-                  height: 50,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 350,
-                          height: 50,
-                          decoration: ShapeDecoration(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(width: 0.50, color: Color(0xFFE7E7E7)),
-                              borderRadius: BorderRadius.circular(34),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 34,
-                        top: 13,
-                        child: Container(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            spacing: 43,
-                            children: [
-                              Container(
-                                width: 20,
-                                height: 20,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage("https://placehold.co/20x20"),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage("https://placehold.co/24x24"),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage("https://placehold.co/24x24"),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 22,
-                                height: 22,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage("https://placehold.co/22x22"),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Container(width: 20, height: 20, child: Stack()),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: 76,
-                child: Container(
-                  width: 393,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        width: 1,
-                        strokeAlign: BorderSide.strokeAlignCenter,
-                        color: Color(0xFFFFF9FB),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 47,
-                top: 270,
-                child: Container(
-                  width: 262,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(width: 262, child: Stack()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 47,
-                top: 338,
-                child: Container(
-                  width: 262,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(width: 262, child: Stack()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 47,
-                top: 489,
-                child: Container(
-                  width: 262,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(width: 262, child: Stack()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 47,
-                top: 370,
-                child: Container(
-                  width: 262,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(width: 262, child: Stack()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 47,
-                top: 553,
-                child: Container(
-                  width: 262,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(width: 262, child: Stack()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 47,
-                top: 521,
-                child: Container(
-                  width: 262,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(width: 262, child: Stack()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 47,
-                top: 401,
-                child: Container(
-                  width: 262,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(width: 262, child: Stack()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 47,
-                top: 584,
-                child: Container(
-                  width: 262,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(width: 262, child: Stack()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 327,
-                top: 331,
-                child: Container(
-                  width: 26,
-                  height: 13,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Text(
-                          '72%',
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            color: Color(0xFFFD6D93),
-                            fontSize: 12,
-                            fontFamily: 'Archivo',
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 327,
-                top: 482,
-                child: Container(
-                  width: 26,
-                  height: 13,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Text(
-                          '80%',
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            color: Color(0xFFFD6D93),
-                            fontSize: 12,
-                            fontFamily: 'Archivo',
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 328,
-                top: 363,
-                child: Text(
-                  '73%',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: Color(0xFFFD6D93),
-                    fontSize: 12,
-                    fontFamily: 'Archivo',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 327,
-                top: 546,
-                child: Text(
-                  '62%',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: Color(0xFFFD6D93),
-                    fontSize: 12,
-                    fontFamily: 'Archivo',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 328,
-                top: 514,
-                child: Text(
-                  '84%',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: Color(0xFFFD6D93),
-                    fontSize: 12,
-                    fontFamily: 'Archivo',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 328,
-                top: 394,
-                child: Text(
-                  '74%',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: Color(0xFFFD6D93),
-                    fontSize: 12,
-                    fontFamily: 'Archivo',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 328,
-                top: 577,
-                child: Text(
-                  '78%',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: Color(0xFFFD6D93),
-                    fontSize: 12,
-                    fontFamily: 'Archivo',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 44,
-                top: 309,
-                child: Text(
-                  'Relevés',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 12,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 44,
-                top: 460,
-                child: Text(
-                  'Jumps',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 12,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 44,
-                top: 375,
-                child: Text(
-                  'Right Leg',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 10,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 44,
-                top: 558,
-                child: Text(
-                  'Single Leg - Right',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 10,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 44,
-                top: 526,
-                child: Text(
-                  'Double Leg',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 10,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 44,
-                top: 343,
-                child: Text(
-                  'Average',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 10,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 44,
-                top: 494,
-                child: Text(
-                  'Average',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 10,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 44,
-                top: 406,
-                child: Text(
-                  'Left Leg',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 10,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 44,
-                top: 589,
-                child: Text(
-                  'Single Leg - Left',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 10,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 97,
-                top: 309,
-                child: Container(
-                  width: 12,
-                  height: 12,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 12,
-                          height: 12,
-                          decoration: ShapeDecoration(
-                            shape: OvalBorder(
-                              side: BorderSide(width: 1, color: Color(0xFFFFDEEA)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 3,
-                        top: 2,
-                        child: SizedBox(
-                          width: 6,
-                          child: Text(
-                            '?',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFFFFDEEA),
-                              fontSize: 8,
-                              fontFamily: 'Archivo',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 88,
-                top: 461,
-                child: Container(
-                  width: 12,
-                  height: 12,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          width: 12,
-                          height: 12,
-                          decoration: ShapeDecoration(
-                            shape: OvalBorder(
-                              side: BorderSide(width: 1, color: Color(0xFFFFDEEA)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 3,
-                        top: 2,
-                        child: SizedBox(
-                          width: 6,
-                          child: Text(
-                            '?',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFFFFDEEA),
-                              fontSize: 8,
-                              fontFamily: 'Archivo',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 44,
-                top: 642,
-                child: Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Self Assessment\n',
-                        style: TextStyle(
-                          color: Color(0xFF390A17),
-                          fontSize: 12,
-                          fontFamily: 'Figtree',
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'VISA-A Questionnaire',
-                        style: TextStyle(
-                          color: Color(0xFF390A17),
-                          fontSize: 10,
-                          fontFamily: 'Figtree',
-                          fontWeight: FontWeight.w300,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 304,
-                top: 642,
-                child: Text(
-                  '84 / 100',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 12,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 52,
-                top: 680,
-                child: Text(
-                  '1.',
-                  style: TextStyle(
-                    color: Color(0xFF390A17),
-                    fontSize: 12,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 72,
-                top: 680,
-                child: SizedBox(
-                  width: 203,
-                  child: Text(
-                    'For how many minutes do you have stiffness in the Achilles region on first getting up?',
-                    style: TextStyle(
-                      color: Color(0xFF390A17),
-                      fontSize: 12,
-                      fontFamily: 'Figtree',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 305,
-                top: 680,
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 323,
-                top: 680,
-                child: Text(
-                  '7',
-                  style: TextStyle(
-                    color: Color(0xFFFD6D93),
-                    fontSize: 14,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 323,
-                top: 740,
-                child: Text(
-                  '4',
-                  style: TextStyle(
-                    color: Color(0xFFFD6D93),
-                    fontSize: 14,
-                    fontFamily: 'Figtree',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -1088,4 +79,369 @@ class Stats extends StatelessWidget {
   }
 }
 
+const List<String> timeScales = <String>['Daily', 'Weekly', 'Monthly', 'Yearly'];
+
+class ToggleButtonsTimeScale extends StatefulWidget {
+  const ToggleButtonsTimeScale({super.key});
+
+  @override
+  State<ToggleButtonsTimeScale> createState() => _ToggleButtonsTimeScaleState();
+}
+
+class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
+  final List<bool> _selectedScale = <bool>[true, false, false, false];
+
+  @override
+  Widget build(BuildContext context) {
+    const height = 40.0;
+    final timeScalesStyled = <Widget>[
+      for (int i = 0; i < timeScales.length; i++)
+        Text(
+          timeScales[i],
+          style: Theme.of(context).textTheme.labelLarge!.copyWith(
+            color: BravaColors.stagePink,
+          ),
+        ),
+    ];
+
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: BravaColors.lightestPink,
+        borderRadius: BorderRadius.all(Radius.circular(height/2,),),
+      ),
+      child: ToggleButtons(
+        direction: Axis.horizontal,
+        onPressed: (int index) {
+          setState(() {
+            // The button that is tapped is set to true, and the others to false.
+            for (int i = 0; i < _selectedScale.length; i++) {
+              _selectedScale[i] = i == index;
+            }
+          });
+        },
+        borderRadius: const BorderRadius.all(Radius.circular(height/2)),
+        color: BravaColors.stagePink,
+        selectedColor: BravaColors.stagePink,
+        fillColor: BravaColors.lightPink,
+        borderColor: Colors.transparent,
+        selectedBorderColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        constraints: const BoxConstraints(minHeight: height, minWidth: 80.0),
+        isSelected: _selectedScale,
+        children: timeScalesStyled,
+      ),
+    );
+  }
+}
+
+
+const List<String> units = <String>['%', 'Count'];
+
+class ToggleButtonsUnits extends StatefulWidget {
+  const ToggleButtonsUnits({super.key});
+
+  @override
+  State<ToggleButtonsUnits> createState() => _ToggleButtonsUnitsState();
+}
+
+class _ToggleButtonsUnitsState extends State<ToggleButtonsUnits> {
+  final List<bool> _selectedScale = <bool>[true, false];
+
+  @override
+  Widget build(BuildContext context) {
+    const height = 30.0;
+    final unitsStyled = <Widget>[
+      for (int i = 0; i < units.length; i++)
+        Text(
+          units[i],
+          style: Theme.of(context).textTheme.labelMedium!.copyWith(
+            color: BravaColors.stagePink,
+          ),
+        ),
+    ];
+
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: BravaColors.lightestPink,
+        borderRadius: BorderRadius.all(Radius.circular(height/2,),),
+      ),
+      child: ToggleButtons(
+        direction: Axis.horizontal,
+        onPressed: (int index) {
+          setState(() {
+            // The button that is tapped is set to true, and the others to false.
+            for (int i = 0; i < _selectedScale.length; i++) {
+              _selectedScale[i] = i == index;
+            }
+          });
+        },
+        borderRadius: const BorderRadius.all(Radius.circular(height/2)),
+        color: BravaColors.stagePink,
+        selectedColor: BravaColors.stagePink,
+        fillColor: BravaColors.lightPink,
+        borderColor: Colors.transparent,
+        selectedBorderColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        constraints: const BoxConstraints(minHeight: height, minWidth: 50.0),
+        isSelected: _selectedScale,
+        children: unitsStyled,
+      ),
+    );
+  }
+}
+
+
+class MovementProgressExpandable extends StatelessWidget {
+  const MovementProgressExpandable({super.key, required this.movementLabel});
+
+  final String movementLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget constantHeader = Column(
+      children: [
+        Row(
+          children: [
+            Text(
+              movementLabel,
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: BravaColors.stagePink, fontWeight: FontWeight.w700,
+              ),
+            ),
+            SizedBox(width: 8,),
+            // Icon(Icons.info_outline_rounded, color: BravaColors.lightPink,),
+            Expanded(child: SizedBox(),),
+          ],
+        ),
+        ProgressBar(label: ""),
+      ],
+    );
+
+    const double dropArrowHeight = 48;
+
+    return ExpandableNotifier(  // <-- Provides ExpandableController to its children
+      child: Container(
+        decoration: BoxDecoration(
+          color: BravaColors.lightestPink,
+          borderRadius: BorderRadius.all(Radius.circular(10,),),
+        ),
+        padding: EdgeInsets.only(left: 12, right: 12, top: 12,),
+        child: Column(  // Maybe delete column if not being used.
+          children: [
+            Expandable(           // <-- Driven by ExpandableController from ExpandableNotifier
+              collapsed: ExpandableButton(  // <-- Expands when tapped on the cover photo
+                child: Column(
+                  children: [
+                    constantHeader,
+                    Icon(Icons.arrow_drop_down_rounded, color: BravaColors.lightPink, size: dropArrowHeight),
+                  ]
+                ),
+              ),
+              expanded: ExpandableButton(       // <-- Collapses when tapped on
+                child: Column(
+                  children: [
+                    constantHeader,
+                    Text("Here are some expanded stats!"),
+                    Icon(Icons.arrow_drop_up_rounded, color: BravaColors.lightPink, size: dropArrowHeight),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class ProgressBar extends StatelessWidget {
+  const ProgressBar({super.key, this.label=""});
+
+  final String label;
+  final double barHeight = 10.0;
+
+  @override
+  Widget build(BuildContext context) {
+    Color backgroundColor = BravaColors.lightPink;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: backgroundColor, width: 2,),
+                  borderRadius: BorderRadius.all(Radius.circular(20,),),
+                ),
+                child: LinearProgressIndicator(
+                  value: 0.76,
+                  color: backgroundColor,
+                  valueColor: AlwaysStoppedAnimation(BravaColors.bravaPink),
+                  minHeight: barHeight,
+                  borderRadius: BorderRadius.all(Radius.circular(barHeight/2),),
+                  trackGap: 2,
+                ),
+              ),
+            ),
+            SizedBox(width: 12,),
+            Container(
+              constraints: BoxConstraints(minWidth: 20,),
+              child: Text(
+                "76%",
+                style: Theme.of(context).textTheme.labelLarge!.copyWith(color: BravaColors.bravaPink, fontWeight: FontWeight.w900,),
+              )
+            ),
+          ],
+        ),
+        if (label != "")
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelLarge!.copyWith(color: BravaColors.stagePink, fontWeight: FontWeight.w300,),
+          ),
+      ],
+    );
+  }
+}
+
+
+// VISA-A QUESTIONNAIRE EXPANDABLE
+class VisaAExpandable extends StatelessWidget {
+  const VisaAExpandable({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget constantHeader = Column(
+      children: [
+        Row(
+          children: [
+            Text(
+              "Self Assessment",
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: BravaColors.stagePink, fontWeight: FontWeight.w700,
+              ),
+            ),
+            Expanded(child: SizedBox(),),
+            Container(
+              // width: 50,
+              height: 30,
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  padding: EdgeInsets.all(0),
+                  backgroundColor: BravaColors.lightPink,
+                  foregroundColor: BravaColors.stagePink,
+                ),
+                onPressed: () {},
+                child: Text("Edit"),
+              ),
+            ),
+            SizedBox(width: 8,),
+            Text(
+              "84 / 100",
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: BravaColors.stagePink, fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        // Subtitle
+        Align(
+          alignment: AlignmentDirectional.topStart,
+          child: Text(
+            "VISA-A Questionnaire",
+            style: Theme.of(context).textTheme.labelLarge!.copyWith(color: BravaColors.stagePink, fontWeight: FontWeight.w400),
+          ),
+        ),
+      ],
+    );
+
+    const double dropArrowHeight = 48;
+
+    return ExpandableNotifier(  // <-- Provides ExpandableController to its children
+      child: Container(
+        decoration: BoxDecoration(
+          color: BravaColors.lightestPink,
+          borderRadius: BorderRadius.all(Radius.circular(10,),),
+        ),
+        padding: EdgeInsets.only(left: 12, right: 12, top: 12,),
+        child: Column(  // Maybe delete column if not being used.
+          children: [
+            Expandable(           // <-- Driven by ExpandableController from ExpandableNotifier
+              collapsed: ExpandableButton(  // <-- Expands when tapped on the cover photo
+                child: Column(
+                    children: [
+                      constantHeader,
+                      Icon(Icons.arrow_drop_down_rounded, color: BravaColors.lightPink, size: dropArrowHeight),
+                    ]
+                ),
+              ),
+              expanded: ExpandableButton(       // <-- Collapses when tapped on
+                child: Column(
+                  children: [
+                    constantHeader,
+                    Text("Here are some expanded stats!"),
+                    Icon(Icons.arrow_drop_up_rounded, color: BravaColors.lightPink, size: dropArrowHeight),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+// CUSTOM TOGGLE WITH ROUNDED INTERNAL BORDERS ---------------------------------
+// class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
+//   int selectedIndex = 0; // Default selected index
+//
+//   final List<String> labels = ["Daily", "Weekly", "Monthly", "Yearly"];
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       // padding: const EdgeInsets.all(4),
+//       decoration: BoxDecoration(
+//         color: BravaColors.lightestPink,
+//         borderRadius: BorderRadius.circular(30),
+//       ),
+//       child: Row(
+//         mainAxisSize: MainAxisSize.min,
+//         children: List.generate(labels.length, (index) {
+//           bool isSelected = index == selectedIndex;
+//           return GestureDetector(
+//             onTap: () {
+//               setState(() {
+//                 selectedIndex = index;
+//               });
+//             },
+//             child: Container(
+//               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+//               decoration: BoxDecoration(
+//                 color: isSelected ? BravaColors.lightPink : Colors.transparent,
+//                 borderRadius: BorderRadius.circular(30),
+//               ),
+//               child: Text(
+//                 labels[index],
+//                 style: Theme.of(context).textTheme.labelLarge!.copyWith(
+//                   color: BravaColors.stagePink,
+//                   fontWeight: FontWeight.w700,
+//                 )
+//               ),
+//             ),
+//           );
+//         }),
+//       ),
+//     );
+//   }
+// }
 
