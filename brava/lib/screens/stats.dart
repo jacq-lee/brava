@@ -17,21 +17,62 @@ class Stats extends StandardPage {
   Widget getContentWidget() {
     return Column(
       children: [
+        // Toggle for Daily / Weekly / Monthly / Yearly breakdown.
         ToggleButtonsTimeScale(),
         SizedBox(height: 8,),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: BravaColors.dirtyDuckGrey.withAlpha(80), width: 2,),
-            borderRadius: BorderRadius.all(Radius.circular(10),),
+        // Box containing the breakdown.
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: BravaColors.dirtyDuckGrey.withAlpha(80), width: 2,),
+              borderRadius: BorderRadius.all(Radius.circular(10),),
+            ),
+            padding: EdgeInsets.all(8),
+            child:
+            Column(
+              children: [
+                // Header displaying date.
+                Container(
+                  decoration: BoxDecoration(
+                    color: BravaColors.lightestPink,
+                    borderRadius: BorderRadius.all(Radius.circular(10),),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.arrow_left_rounded, color: BravaColors.bravaPink, size: 48,),
+                      // Current Date Button.
+                      Expanded(
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: BravaColors.lightestPink,
+                            foregroundColor: BravaColors.stagePink,
+                          ),
+                          onPressed: () {},
+                          child: Text("Mar 20, 2024"),
+                        ),
+                      ),
+                      Icon(Icons.arrow_right_rounded, color: BravaColors.bravaPink, size: 48,),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 8,),
+                // Toggle between percentage and count.
+                Align(alignment: AlignmentDirectional.centerEnd, child: ToggleButtonsUnits(),),
+                SizedBox(height: 8,),
+                // Scrollable area for the rest of the breakdown.
+                Expanded(
+                  child: ListView(
+                    padding: EdgeInsets.all(0),
+                    children: <Widget>[
+                      MovementProgressExpandable(movementLabel: "Total",),
+                      SizedBox(height: 8,),
+                      VisaAExpandable(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-          // child: SizedBox(width: 400, height: 300,),
-          child: MovementProgressExpandable(movementLabel: "Total",),
-          // child: ListView(
-          //   padding: EdgeInsets.all(8),
-          //   children: <Widget>[
-          //     EventPhotos(),
-          //   ],
-          // ),
         ),
       ],
     );
@@ -95,6 +136,63 @@ class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
 }
 
 
+const List<String> units = <String>['%', 'Count'];
+
+class ToggleButtonsUnits extends StatefulWidget {
+  const ToggleButtonsUnits({super.key});
+
+  @override
+  State<ToggleButtonsUnits> createState() => _ToggleButtonsUnitsState();
+}
+
+class _ToggleButtonsUnitsState extends State<ToggleButtonsUnits> {
+  final List<bool> _selectedScale = <bool>[true, false];
+
+  @override
+  Widget build(BuildContext context) {
+    const height = 30.0;
+    final unitsStyled = <Widget>[
+      for (int i = 0; i < units.length; i++)
+        Text(
+          units[i],
+          style: Theme.of(context).textTheme.labelMedium!.copyWith(
+            color: BravaColors.stagePink,
+          ),
+        ),
+    ];
+
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: BravaColors.lightestPink,
+        borderRadius: BorderRadius.all(Radius.circular(height/2,),),
+      ),
+      child: ToggleButtons(
+        direction: Axis.horizontal,
+        onPressed: (int index) {
+          setState(() {
+            // The button that is tapped is set to true, and the others to false.
+            for (int i = 0; i < _selectedScale.length; i++) {
+              _selectedScale[i] = i == index;
+            }
+          });
+        },
+        borderRadius: const BorderRadius.all(Radius.circular(height/2)),
+        color: BravaColors.stagePink,
+        selectedColor: BravaColors.stagePink,
+        fillColor: BravaColors.lightPink,
+        borderColor: Colors.transparent,
+        selectedBorderColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        constraints: const BoxConstraints(minHeight: height, minWidth: 50.0),
+        isSelected: _selectedScale,
+        children: unitsStyled,
+      ),
+    );
+  }
+}
+
+
 // class MovementProgressExpandable extends StatelessWidget {
 //   const MovementProgressBarsCard({super.key});
 //
@@ -129,13 +227,16 @@ class MovementProgressExpandable extends StatelessWidget {
                 color: BravaColors.stagePink, fontWeight: FontWeight.w700,
               ),
             ),
-            Icon(Icons.help_center_outlined, color: BravaColors.bravaPink,),
+            SizedBox(width: 8,),
+            // Icon(Icons.info_outline_rounded, color: BravaColors.lightPink,),
             Expanded(child: SizedBox(),),
           ],
         ),
-        ProgressBar(label: "Average"),
+        ProgressBar(label: ""),
       ],
     );
+
+    const double dropArrowHeight = 48;
 
     return ExpandableNotifier(  // <-- Provides ExpandableController to its children
       child: Container(
@@ -143,20 +244,26 @@ class MovementProgressExpandable extends StatelessWidget {
           color: BravaColors.lightestPink,
           borderRadius: BorderRadius.all(Radius.circular(10,),),
         ),
+        padding: EdgeInsets.only(left: 12, right: 12, top: 12,),
         child: Column(  // Maybe delete column if not being used.
           children: [
             Expandable(           // <-- Driven by ExpandableController from ExpandableNotifier
               collapsed: ExpandableButton(  // <-- Expands when tapped on the cover photo
-                child: constantHeader,
-              ),
-              expanded: Column(
+                child: Column(
                   children: [
                     constantHeader,
-                    Text("omg hey again"),
-                    ExpandableButton(       // <-- Collapses when tapped on
-                      child: Text("Back"),
-                    ),
+                    Icon(Icons.arrow_drop_down_rounded, color: BravaColors.lightPink, size: dropArrowHeight),
                   ]
+                ),
+              ),
+              expanded: ExpandableButton(       // <-- Collapses when tapped on
+                child: Column(
+                  children: [
+                    constantHeader,
+                    Text("Here are some expanded stats!"),
+                    Icon(Icons.arrow_drop_up_rounded, color: BravaColors.lightPink, size: dropArrowHeight),
+                  ],
+                ),
               ),
             ),
           ],
@@ -209,18 +316,107 @@ class ProgressBar extends StatelessWidget {
             ),
           ],
         ),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelLarge!.copyWith(color: BravaColors.stagePink, fontWeight: FontWeight.w300,),
-        )
+        if (label != "")
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelLarge!.copyWith(color: BravaColors.stagePink, fontWeight: FontWeight.w300,),
+          ),
       ],
     );
   }
 }
 
 
+// VISA-A QUESTIONNAIRE EXPANDABLE
+class VisaAExpandable extends StatelessWidget {
+  const VisaAExpandable({super.key});
 
-// FUNCTIONAL, GPT -------------------------------------------------------------
+  @override
+  Widget build(BuildContext context) {
+    Widget constantHeader = Column(
+      children: [
+        Row(
+          children: [
+            Text(
+              "Self Assessment",
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: BravaColors.stagePink, fontWeight: FontWeight.w700,
+              ),
+            ),
+            Expanded(child: SizedBox(),),
+            Container(
+              // width: 50,
+              height: 30,
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  padding: EdgeInsets.all(0),
+                  backgroundColor: BravaColors.lightPink,
+                  foregroundColor: BravaColors.stagePink,
+                ),
+                onPressed: () {},
+                child: Text("Edit"),
+              ),
+            ),
+            SizedBox(width: 8,),
+            Text(
+              "84 / 100",
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: BravaColors.stagePink, fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        // Subtitle
+        Align(
+          alignment: AlignmentDirectional.topStart,
+          child: Text(
+            "VISA-A Questionnaire",
+            style: Theme.of(context).textTheme.labelLarge!.copyWith(color: BravaColors.stagePink, fontWeight: FontWeight.w400),
+          ),
+        ),
+      ],
+    );
+
+    const double dropArrowHeight = 48;
+
+    return ExpandableNotifier(  // <-- Provides ExpandableController to its children
+      child: Container(
+        decoration: BoxDecoration(
+          color: BravaColors.lightestPink,
+          borderRadius: BorderRadius.all(Radius.circular(10,),),
+        ),
+        padding: EdgeInsets.only(left: 12, right: 12, top: 12,),
+        child: Column(  // Maybe delete column if not being used.
+          children: [
+            Expandable(           // <-- Driven by ExpandableController from ExpandableNotifier
+              collapsed: ExpandableButton(  // <-- Expands when tapped on the cover photo
+                child: Column(
+                    children: [
+                      constantHeader,
+                      Icon(Icons.arrow_drop_down_rounded, color: BravaColors.lightPink, size: dropArrowHeight),
+                    ]
+                ),
+              ),
+              expanded: ExpandableButton(       // <-- Collapses when tapped on
+                child: Column(
+                  children: [
+                    constantHeader,
+                    Text("Here are some expanded stats!"),
+                    Icon(Icons.arrow_drop_up_rounded, color: BravaColors.lightPink, size: dropArrowHeight),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+// FUNCTIONAL TOGGLE, GPT -------------------------------------------------------------
 // class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
 //   int selectedIndex = 0; // Default selected index
 //

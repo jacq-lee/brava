@@ -18,12 +18,12 @@ class StandardPage extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          SizedBox(height: edgePadTop,),
+          SizedBox(height: ScreenPadding.edgePadTop,),
           PageHeader(pageTitle: getPageTitle(),),
           SizedBox(height: 16,),
           Expanded(
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 32,),
+              margin: EdgeInsets.symmetric(horizontal: ScreenPadding.edgePadH,),
               child: getContentWidget(),
             )
           ),
@@ -42,7 +42,7 @@ class PageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: edgePadH, right: edgePadH, bottom: 8,),
+      padding: EdgeInsets.only(left: ScreenPadding.edgePadH, right: ScreenPadding.edgePadH, bottom: 8,),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: BravaColors.lightestPink, width: 2,),),
       ),
