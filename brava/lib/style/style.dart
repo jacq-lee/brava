@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 
 class BravaColors {
@@ -25,30 +24,30 @@ final bravaAppTheme = ThemeData(
   // text, etc.
   fontFamily: 'Figtree',
   textTheme: TextTheme(
-  //   displayLarge: GoogleFonts.figtree(),
-  //   displayMedium: GoogleFonts.figtree(),
-  //   displaySmall: GoogleFonts.figtree(),
-  //   headlineLarge: GoogleFonts.figtree(),
-  //   headlineMedium: GoogleFonts.figtree(),
-  //   headlineSmall: GoogleFonts.figtree(),
-  //   titleLarge: GoogleFonts.figtree(),
-  //   titleMedium: GoogleFonts.figtree(),
-  //   titleSmall: GoogleFonts.figtree(),
-  //   bodyLarge: GoogleFonts.figtree(),
-    bodyMedium: GoogleFonts.figtree(
+  //   displayLarge: TextStyle(),
+  //   displayMedium: TextStyle(),
+  //   displaySmall: TextStyle(),
+  //   headlineLarge: TextStyle(),
+  //   headlineMedium: TextStyle(),
+  //   headlineSmall: TextStyle(),
+  //   titleLarge: TextStyle(),
+  //   titleMedium: TextStyle(),
+  //   titleSmall: TextStyle(),
+  //   bodyLarge: TextStyle(),
+    bodyMedium: TextStyle(
       // Usage: Default body text.
       fontSize: 16,
     ),
-  //   bodySmall: GoogleFonts.figtree(),
-    labelLarge: GoogleFonts.figtree(
+  //   bodySmall: TextStyle(),
+    labelLarge: TextStyle(
       // Usage: e.g. bolded text on buttons or interactive elements.
       fontWeight: FontWeight.w700,
     ),
-    labelMedium: GoogleFonts.figtree(
+    labelMedium: TextStyle(
       // Usage: Standard small subtitle font.
       fontWeight: FontWeight.w300,  // Not applying for some reason.
     ),
-    labelSmall: GoogleFonts.figtree(
+    labelSmall: TextStyle(
       // Usage: Smallest subtitle font.
       fontWeight: FontWeight.w300,  // Not applying for some reason.
     ),
