@@ -8,23 +8,25 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        // Welcome text.
-        const Text("Hello Jacaitelle!\nHere's your daily summary.", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Figtree', fontWeight: FontWeight.w700)),
-        // Spacing
-        SizedBox(height: 24),
-        // Button: Start Session.
-        const PrimaryButton(btnText: "Start Session",),
-        SizedBox(height: 48),
-        TlProgressIndicator(),
-        SizedBox(height: 24),
-        MovementCountRow(),
-        SizedBox(height: 48),
-        // Button: Complete today's self assessment.
-        const PrimaryButton(btnText: "Complete Today's Self Assessment")
-      ],
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          // Welcome text.
+          const Text("Hello Jacaitellerie!\nHere's your daily summary.", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Figtree', fontWeight: FontWeight.w700)),
+          // Spacing
+          SizedBox(height: 24),
+          // Button: Start Session.
+          const PrimaryButton(btnText: "Start Session",),
+          SizedBox(height: 48),
+          TlProgressIndicator(),
+          SizedBox(height: 24),
+          MovementCountRow(),
+          SizedBox(height: 48),
+          // Button: Complete today's self assessment.
+          const PrimaryButton(btnText: "Complete Today's Self Assessment")
+        ],
+      ),
     );
   }
 }

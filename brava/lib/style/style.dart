@@ -11,6 +11,9 @@ const dirtyDuckGrey = Color(0xFFCDC1C1);
 const stagePink = Color(0xFF390A17);
 const marleyBlack = Color(0xFF131214);
 
+const edgePadH = 32.0;  // Standard padding from the edge of the screen.
+const edgePadTop = 64.0;  // Standard padding from the top of the screen.
+
 final bravaAppTheme = ThemeData(
   // The theme of the application.
   // Most important attributes: colorScheme and textTheme.
