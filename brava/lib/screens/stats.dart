@@ -99,7 +99,7 @@ class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
         Text(
           timeScales[i],
           style: Theme.of(context).textTheme.labelLarge!.copyWith(
-              color: BravaColors.stagePink,
+            color: BravaColors.stagePink,
           ),
         ),
     ];
@@ -193,23 +193,6 @@ class _ToggleButtonsUnitsState extends State<ToggleButtonsUnits> {
 }
 
 
-// class MovementProgressExpandable extends StatelessWidget {
-//   const MovementProgressBarsCard({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Card(
-//       child: InkWell(
-//         splashColor: Colors.blue.withAlpha(30),
-//         onTap: () {
-//           debugPrint('Card tapped.');
-//         },
-//         child: const SizedBox(width: 300, height: 100, child: Text('A card that can be tapped')),
-//       ),
-//     );
-//   }
-// }
-
 class MovementProgressExpandable extends StatelessWidget {
   const MovementProgressExpandable({super.key, required this.movementLabel});
 
@@ -272,6 +255,7 @@ class MovementProgressExpandable extends StatelessWidget {
     );
   }
 }
+
 
 class ProgressBar extends StatelessWidget {
   const ProgressBar({super.key, this.label=""});
@@ -416,7 +400,7 @@ class VisaAExpandable extends StatelessWidget {
 
 
 
-// FUNCTIONAL TOGGLE, GPT -------------------------------------------------------------
+// CUSTOM TOGGLE WITH ROUNDED INTERNAL BORDERS ---------------------------------
 // class _ToggleButtonsTimeScaleState extends State<ToggleButtonsTimeScale> {
 //   int selectedIndex = 0; // Default selected index
 //
