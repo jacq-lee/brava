@@ -44,13 +44,13 @@ class PageHeader extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(left: edgePadH, right: edgePadH, bottom: 8,),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: lightestPink, width: 2,),),
+        border: Border(bottom: BorderSide(color: BravaColors.lightestPink, width: 2,),),
       ),
       child: Row(
         children: [
           Text(
               pageTitle,
-              style: TextStyle(color: marleyBlack, fontWeight: FontWeight.w700),
+              style: TextStyle(color: BravaColors.marleyBlack, fontWeight: FontWeight.w700),
           ),
           Expanded(child: SizedBox(),),
         ],
@@ -69,8 +69,8 @@ class PrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FilledButton(
       style: FilledButton.styleFrom(
-        backgroundColor: lightPink,
-        foregroundColor: stagePink,
+        backgroundColor: BravaColors.lightPink,
+        foregroundColor: BravaColors.stagePink,
       ),
       onPressed: () {},
       child: Text(btnText),
@@ -88,9 +88,9 @@ class SecondaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        backgroundColor: lightestPink,
-        foregroundColor: stagePink,
-        side: BorderSide(color: lightPink,),
+        backgroundColor: BravaColors.lightestPink,
+        foregroundColor: BravaColors.stagePink,
+        side: BorderSide(color: BravaColors.lightPink,),
       ),
       onPressed: () {},
       child: Text(btnText,),
@@ -114,9 +114,9 @@ class _SwitchWidgetState extends State<SwitchWidget> {
     return Switch(
       // This bool value toggles the switch.
       value: light,
-      activeTrackColor: bravaPink,  // Background colour (active).
+      activeTrackColor: BravaColors.bravaPink,  // Background colour (active).
       activeColor: Colors.white,  // Small, inner circle.
-      inactiveTrackColor: dirtyDuckGrey.withAlpha(50),  // Background colour (inactive).
+      inactiveTrackColor: BravaColors.dirtyDuckGrey.withAlpha(50),  // Background colour (inactive).
       inactiveThumbColor: Colors.grey.shade500,  // Small, inner circle.
       trackOutlineColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {  // Border colour (inactive).
         if (states.contains(WidgetState.selected)) {

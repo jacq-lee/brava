@@ -50,7 +50,7 @@ class VideoPreviewWidget extends StatelessWidget {
     return Container(
       // Border around whole video preview widget.
       decoration: BoxDecoration(
-        border: Border.all(color: dirtyDuckGrey, width: 2,),
+        border: Border.all(color: BravaColors.dirtyDuckGrey, width: 2,),
         borderRadius: BorderRadius.all(Radius.circular(cornerRad)),
       ),
       child: Column(
@@ -61,14 +61,14 @@ class VideoPreviewWidget extends StatelessWidget {
             alignment: AlignmentDirectional.center,
             children: [
               SizedBox(height: 200),
-              Icon(Icons.videocam_off_outlined, color: dirtyDuckGrey,)
+              Icon(Icons.videocam_off_outlined, color: BravaColors.dirtyDuckGrey,)
             ],
           ),
           // Bottom control bar of video preview.
           Container(
             padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             decoration: BoxDecoration(
-              color: lightestPink,
+              color: BravaColors.lightestPink,
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(cornerRad))
             ),
             child: Row(
@@ -83,7 +83,7 @@ class VideoPreviewWidget extends StatelessWidget {
                 SizedBox(width: 4),
                 Text("See Preview"),
                 Expanded(child: SizedBox()),
-                Icon(Icons.fullscreen, color: dirtyDuckGrey),  // Make functional and enable/disable
+                Icon(Icons.fullscreen, color: BravaColors.dirtyDuckGrey),  // Make functional and enable/disable
               ],
             ),
           ),
@@ -107,7 +107,7 @@ class ConnectedCameraCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 2,),
       decoration: BoxDecoration(
-        color: lightestPink,
+        color: BravaColors.lightestPink,
         borderRadius: BorderRadius.all(Radius.circular(10.0),),
       ),
       child: Row(
@@ -117,7 +117,7 @@ class ConnectedCameraCard extends StatelessWidget {
             // If the card is for a phone's built in camera, add a checkbox for
             // enabling/disabling its use.
             Checkbox(
-              checkColor: bravaPink,
+              checkColor: BravaColors.bravaPink,
               // fillColor: WidgetStateProperty.resolveWith(getColor),
               value: false,
               onChanged: (bool? value) {},
@@ -127,11 +127,11 @@ class ConnectedCameraCard extends StatelessWidget {
             SizedBox(width: 16,),
           Text(
             deviceName,
-            style: TextStyle(color: stagePink,),
+            style: TextStyle(color: BravaColors.stagePink,),
           ),
           Expanded(child: SizedBox(),),
           PopupMenuButton(
-            iconColor: stagePink,
+            iconColor: BravaColors.stagePink,
             itemBuilder: (BuildContext context) => <PopupMenuEntry<CameraMenu>>[
               const PopupMenuItem<CameraMenu>(
                 value: CameraMenu.rename,
