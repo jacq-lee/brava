@@ -15,16 +15,19 @@ class Home extends StatelessWidget {
           // Welcome text.
           const Text("Hello Jacaitellerie!\nHere's your daily summary.", textAlign: TextAlign.center, style: TextStyle(fontFamily: 'Figtree', fontWeight: FontWeight.w700)),
           // Spacing
-          SizedBox(height: 24),
-          // Button: Start Session.
-          const PrimaryButton(btnText: "Start Session",),
-          SizedBox(height: 48),
+          SizedBox(height: 36),
+          // Button: Start Session / End Session.
+          RunSessionWidget(),
+          SizedBox(height: 36),
           TlProgressIndicator(),
-          SizedBox(height: 24),
-          MovementCountRow(),
           SizedBox(height: 48),
+          MovementCountRow(),
+          SizedBox(height: 24),
           // Button: Complete today's self assessment.
-          const PrimaryButton(btnText: "Complete Today's Self Assessment")
+          // PrimaryButton(
+          //     text: "Complete Today's Self Assessment",
+          //     onPressed: () {},
+          // ),
         ],
       ),
     );
@@ -71,6 +74,48 @@ class TlProgressIndicator extends StatelessWidget {
             Text("of Daily Training\nLoad Limit", textAlign: TextAlign.center, style: TextStyle(color: BravaColors.stagePink, fontWeight: FontWeight.w500),),
           ],
         )
+      ],
+    );
+  }
+}
+
+
+class RunSessionWidget extends StatefulWidget {
+  const RunSessionWidget({super.key});
+
+  @override
+  State<RunSessionWidget> createState() => _RunSessionWidgetState();
+}
+
+class _RunSessionWidgetState extends State<RunSessionWidget> {
+  bool running = false;
+
+  void _toggleRecording() {
+    setState(() {
+      running = !running;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    // If running, return the first widget (End Session button and text).
+    // If not running, return the second widget (Start Session button)
+    return Column(
+      children: [
+        running
+            ? SecondaryButton(
+          text: "End Session",
+          onPressed: _toggleRecording,
+        )
+            : PrimaryButton(
+          text: "Start Session",
+          onPressed: _toggleRecording,
+        ),
+        Text(
+          running ? "Movement analysis in progress..." : "",
+          style: Theme.of(context).textTheme.labelMedium!.copyWith(color: BravaColors.dirtyDuckGrey, fontWeight: FontWeight.w700,),
+        ),
       ],
     );
   }

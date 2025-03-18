@@ -61,9 +61,14 @@ class PageHeader extends StatelessWidget {
 
 
 class PrimaryButton extends StatelessWidget {
-  const PrimaryButton({super.key, this.btnText=""});
+  const PrimaryButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+  });
 
-  final String btnText;
+  final String text;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -72,17 +77,22 @@ class PrimaryButton extends StatelessWidget {
         backgroundColor: BravaColors.lightPink,
         foregroundColor: BravaColors.stagePink,
       ),
-      onPressed: () {},
-      child: Text(btnText),
+      onPressed: onPressed,
+      child: Text(text),
     );
   }
 }
 
 
 class SecondaryButton extends StatelessWidget {
-  const SecondaryButton({super.key, this.btnText=""});
+  const SecondaryButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+  });
 
-  final String btnText;
+  final String text;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -92,8 +102,8 @@ class SecondaryButton extends StatelessWidget {
         foregroundColor: BravaColors.stagePink,
         side: BorderSide(color: BravaColors.lightPink,),
       ),
-      onPressed: () {},
-      child: Text(btnText,),
+      onPressed: onPressed,
+      child: Text(text),
     );
   }
 }
