@@ -29,9 +29,9 @@ class Camera extends StandardPage {
         // Add and disconnect camera buttons.
         Row(
           children: [
-            PrimaryButton(btnText: "Add Camera",),
+            PrimaryButton(text: "Add Camera", onPressed: () {}),
             Expanded(child: SizedBox(),),
-            SecondaryButton(btnText: "Disconnect All",),
+            SecondaryButton(text: "Disconnect All", onPressed: () {},),
           ],
         ),
       ],
@@ -96,11 +96,18 @@ class VideoPreviewWidget extends StatelessWidget {
 
 enum CameraMenu { rename, properties, disconnect, }
 
-class ConnectedCameraCard extends StatelessWidget {
+class ConnectedCameraCard extends StatefulWidget {
   const ConnectedCameraCard({super.key, required this.deviceName, required this.builtIn,});
 
   final bool builtIn;
   final String deviceName;
+
+  @override
+  State<ConnectedCameraCard> createState() => _ConnectedCameraCardState();
+}
+
+class _ConnectedCameraCardState extends State<ConnectedCameraCard> {
+  bool usePhoneCam = false;
 
   @override
   Widget build(BuildContext context) {
@@ -113,20 +120,29 @@ class ConnectedCameraCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (builtIn)
-            // If the card is for a phone's built in camera, add a checkbox for
-            // enabling/disabling its use.
+          if (widget.builtIn)
+          // If the card is for a phone's built in camera, add a checkbox for
+          // enabling/disabling its use.
             Checkbox(
-              checkColor: BravaColors.bravaPink,
-              // fillColor: WidgetStateProperty.resolveWith(getColor),
-              value: false,
-              onChanged: (bool? value) {},
+              checkColor: Colors.white,
+              fillColor: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
+                if (!states.contains(WidgetState.selected)) {
+                  return Colors.transparent;
+                }
+                return BravaColors.bravaPink;
+              }),
+              value: usePhoneCam,
+              onChanged: (bool? value) {
+                setState(() {
+                  usePhoneCam = value!;
+                });
+              }
             )
           else
-            // Else add padding, since the checkbox normally creates a visual gap.
+          // Else add padding, since the checkbox normally creates a visual gap.
             SizedBox(width: 16,),
           Text(
-            deviceName,
+            widget.deviceName,
             style: TextStyle(color: BravaColors.stagePink,),
           ),
           Expanded(child: SizedBox(),),
