@@ -12,11 +12,31 @@ mp_pose = mp.solutions.pose
 WIN_LEN = 40
 OVERLAP = 16
 time_counter = 0
-DLJ_counter, SLJ_R_counter, SLJ_L_counter, DLR_counter, SLR_R_counter, SLR_L_counter = 0, 0, 0, 0, 0, 0
-DLJ_indices, SLJ_R_indices, SLJ_L_indices, DLR_indices, SLR_R_indices, SLR_L_indices = [], [], [], [], [], []
+# DLJ_counter, SLJ_R_counter, SLJ_L_counter, DLR_counter, SLR_R_counter, SLR_L_counter = 0, 0, 0, 0, 0, 0
+# DLJ_indices, SLJ_R_indices, SLJ_L_indices, DLR_indices, SLR_R_indices, SLR_L_indices = [], [], [], [], [], []
 
-def test_function(word):
-    print(word)
+counter_dict = {
+    'DLJ': 0,
+    'SLJ_R': 0,
+    'SLJ_L': 0,
+    'DLR': 0,
+    'SLR_R': 0,
+    'SLR_L': 0
+}
+
+indices_dict = {
+    'DLJ': [],
+    'SLJ_R': [],
+    'SLJ_L': [],
+    'DLR': [],
+    'SLR_R': [],
+    'SLR_L': []
+}
+
+prev_max_index = {
+    'DLJ': 0,
+    'SLJ' : 0
+}
 
 
 logging.basicConfig(filename='error_log.txt', level=logging.ERROR)
@@ -67,6 +87,9 @@ def normalize_data(data: np.ndarray, x_rhip: np.ndarray, y_rhip: np.ndarray, x_r
     
     Note: consider altering in the future to normalize depending on the time (e.g. frame by frame).
     """
+    if x_rhip[0] == None or y_rhip[0] == None or x_rknee[0] == None or y_rknee[0] == None or x_lhip[0] == None or y_lhip[0] == None or x_lknee[0] == None or y_lknee[0] == None:
+        print("Warning: First element of landmark array is still None.")
+        return
     femur_length_r = length_cal(x_rhip[0], y_rhip[0], x_rknee[0], y_rknee[0])
     femur_length_l = length_cal(x_lhip[0], y_lhip[0], x_lknee[0], y_lknee[0])
 
@@ -129,7 +152,8 @@ def calculate_peak_diff(data):
     abs_diff = abs(np.max(data[peaks]) - np.min(data[neg_peaks]))
     return peaks, neg_peaks, abs_diff
 
-def algorithm_logic(window, prev_window):
+def algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_index, i):
+    # print(f"i = {i}")
     # Extract data.
     x_rknee, y_rknee =      extract_from_window(window, "RKnee")
     x_lknee, y_lknee =      extract_from_window(window, "LKnee")
@@ -138,7 +162,7 @@ def algorithm_logic(window, prev_window):
     x_rhip, y_rhip =        extract_from_window(window, "RHip")
     x_lhip, y_lhip =        extract_from_window(window, "LHip")
     frame_array = np.arange(len(x_rknee))
-    print(len(frame_array))
+    # print(len(frame_array))
     # Ignore applying a filter for now!
 
     # Normalize y-coordinates.
@@ -197,21 +221,22 @@ def algorithm_logic(window, prev_window):
 
     x_scatter_val = avg_delta_hip_vel*mad_multiplier
     y_scatter_val = avg_delta_hip_height*mad_multiplier
-
 #################### CLASSIFICATION LOGIC ####################
     ############### DLJ ###############
     if y_scatter_val > 0.7 and x_scatter_val > 0.1:
         print(f"window : maybe DLJ")
-        # if abs_diff_peaks > 0.7:
-        #     DLJ_counter += 1
-        #     DLJ_indices.append(i)
-        # if largest_peak >= WIN_SIZE - OVERLAP:
-        #     prev_max_index = largest_peak
-        #     DLJ_indices.append(i)
-        # elif largest_peak < OVERLAP:
-        #     if largest_peak +  (WIN_SIZE - OVERLAP) == prev_max_index:
-        #         DLJ_counter -= 1
-        #         DLJ_indices.pop()
+        if abs_diff_peaks > 0.7:
+            counter_dict['DLJ'] += 1
+
+            indices_dict['DLJ'].append(i)
+        if largest_peak >= WIN_LEN - OVERLAP:
+        # if WIN_LEN - OVERLAP - 2 <= largest_peak <= WIN_LEN - OVERLAP + 2:
+            prev_max_index['DLJ'] = largest_peak
+            indices_dict['DLJ'].append(i)
+        elif largest_peak < OVERLAP:
+            if largest_peak +  (WIN_LEN - OVERLAP) == prev_max_index['DLJ']:
+                counter_dict['DLJ'] -= 1
+                indices_dict['DLJ'].pop()
     ################################### 
 
     ############### SLJ ###############
@@ -226,36 +251,60 @@ def algorithm_logic(window, prev_window):
             working_leg = "r"
         print(f"SLJ working_leg = {working_leg}")
         ###################
-        # if abs_diff_peaks > 0.7:
-        #     if working_leg == "l":
-        #         SLJ_L_counter += 1
-        #         SLJ_L_indices.append(i)
-        #     elif working_leg == "r":
-        #         SLJ_R_counter += 1
-        #         SLJ_R_indices.append(i)
-        # if largest_peak >= WIN_SIZE - OVERLAP:
-        #     prev_max_index = largest_peak
-        #     if working_leg == "l":
-        #         SLJ_L_indices.append(i)
-        #     elif working_leg == "r":
-        #         SLJ_R_indices.append(i)        
-        # elif largest_peak < OVERLAP:
-        #     if largest_peak +  (WIN_SIZE - OVERLAP) == prev_max_index:
-        #         if working_leg == "l":
-        #             SLJ_L_counter -= 1
-        #             SLJ_L_indices.pop()
-        #         elif working_leg == "r":
-        #             SLJ_R_counter -= 1
-        #             SLJ_R_indices.pop()
+        if abs_diff_peaks > 0.7:
+            if working_leg == "l":
+                counter_dict['SLJ_L'] += 1
+                indices_dict['SLJ_L'].append(i)
+            elif working_leg == "r":
+                counter_dict['SLJ_R'] += 1
+                indices_dict['SLJ_R'].append(i)
+        if largest_peak >= WIN_LEN - OVERLAP:
+            prev_max_index['SLJ'] = largest_peak
+            if working_leg == "l":
+                indices_dict['SLJ_L'].append(i)
+            elif working_leg == "r":
+                indices_dict['SLJ_R'].append(i)        
+        elif largest_peak < OVERLAP:
+            if largest_peak +  (WIN_LEN - OVERLAP) == prev_max_index['SLJ']:
+                if working_leg == "l":
+                    print("popping SLJ_L")
+                    counter_dict['SLJ_L'] -= 1
+                    indices_dict['SLJ_L'].pop()
+                elif working_leg == "r":
+                    print("popping SLJ_R")
+                    counter_dict['SLJ_R'] -= 1
+                    indices_dict['SLJ_R'].pop()
     ################################### 
 
-
+    print(f"y_scatter_val = {y_scatter_val:.2f}")
+    print(f"x_scatter_val = {x_scatter_val:.2f}")
     ############### DLR ###############
-    if y_scatter_val > 0.15 and y_scatter_val < 0.5 and x_scatter_val > 0.02 and x_scatter_val < 0.05:
+    if y_scatter_val > 0.10 and y_scatter_val < 0.4 and x_scatter_val > 0.02 and x_scatter_val < 0.08:
         # print(f"window {i} : maybe DLR")
+        print(f"up_l = {up_l}")
+        print(f"up_r = {up_r}")
+
         if up_l or up_r: 
-            DLR_counter += 1
+            counter_dict['DLR'] += 1
     ################################### 
+
+    ############### SLR ###############
+    if y_scatter_val < -0.10 and y_scatter_val > -0.4 and x_scatter_val < -0.02 and x_scatter_val > -0.08:
+        ##### L or R #####
+        height_r_ankle = np.mean(y_rankle)
+        height_l_ankle = np.mean(y_lankle)
+        if height_l_ankle < height_r_ankle:
+            working_leg = "l"
+        else:
+            working_leg = "r"
+        print(f"SLR working_leg = {working_leg}")
+        ###################
+
+        if up_l and working_leg == 'l': 
+            counter_dict['SLR_L'] += 1
+        if up_r and working_leg == 'r': 
+            counter_dict['SLR_R'] += 1
+
 
 ##############################################################
     # print(y_rknee)
@@ -283,6 +332,7 @@ def make_detections():
 
             prev_win = []
             counter = 0
+            window_num = 0
             time_counter = 0
             start_index = 0
             initial_increment_len = 40
@@ -305,8 +355,10 @@ def make_detections():
                             window[lm][start_index + counter] = (x, y)
                     counter += 1
                     if counter >= increment_len: 
+                        # print(f"time={time_counter}")
                         prev_window = copy.deepcopy(window)
-                        algorithm_logic(window, prev_window)
+                        print(window)
+                        algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_index, window_num)
                         for lm in window.keys():
                             points = window[lm]
                             for i in range(len(points) - 1):
@@ -320,6 +372,7 @@ def make_detections():
                             window[lm][:OVERLAP] = window[lm][-OVERLAP:]
                             window[lm][OVERLAP:] = [None] * (len(window[lm]) - OVERLAP)
                         counter = 0
+                        window_num += 1
                     time_counter += 1
 
 
@@ -341,6 +394,7 @@ def make_detections():
             cap.release()
             cv2.destroyAllWindows()
             plt.show()
+            print(counter_dict)
 
     except Exception as e: 
         logging.error(f"Error occurred: {str(e)}")
