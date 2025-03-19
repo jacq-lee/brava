@@ -12,11 +12,15 @@ from PySide6.QtWidgets import (
 )
 import numpy as np
 from collections import deque
-
+import logging
+import traceback
+logging.basicConfig(filename='error_log.txt', level=logging.ERROR)
 # Initialize Mediapipe Pose
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose()
 
+WIN_LEN = 40
+OVERLAP = 16
 
 class BravaWindow(QMainWindow):
     def __init__(self):
@@ -80,14 +84,42 @@ class CVWorker(QThread):
         frame_buffer = deque(maxlen=30)
 
         self.ThreadActive = True       
-        cap = cv.VideoCapture(0) 
-
+        cap = cv.VideoCapture(1) 
+        window = [None] * WIN_LEN
+        prev_win = []
+        counter = 0
+        start_index = 0
+        time_counter = 0
+        m = 0
+        initial_increment_len = 40
+        increment_len = initial_increment_len
         while self.ThreadActive:
+
             ret, frame = cap.read()
             # frame_width = cap.get(cv.CAP_PROP_FRAME_WIDTH)  # Auto: 640.0
             # frame_height = cap.get(cv.CAP_PROP_FRAME_HEIGHT)  # Auto: 480.0
             
             if ret:  # If frame is read correctly.
+                ### WINDOW LOGIC ####
+                window[start_index + counter]=m
+                counter += 1
+                # print("test")
+                # print(f"incremenent_len={increment_len}")
+                # print(f"counter={counter}")
+
+                if counter >= increment_len: 
+                    increment_len = WIN_LEN - OVERLAP
+                    start_index = OVERLAP
+                    prev_win = list(window)
+                    print("original window:")
+                    print(window)
+                    window[:OVERLAP] = window[-OVERLAP:]
+                    window[OVERLAP:] = [None] * (len(window) - OVERLAP)
+                    counter = 0
+                m += 1
+                time_counter += 1
+                ### END OF WINDOW LOGIC ###
+
                 # ret = cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
                 # ret = cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
                     
@@ -119,6 +151,10 @@ class CVWorker(QThread):
                 ConvertToQtFormat = QImage(rgb_frame.data, rgb_frame.shape[1], rgb_frame.shape[0], QImage.Format_RGB888)
                 Pic = ConvertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
                 self.ImageUpdate.emit(ConvertToQtFormat)
+
+                if time_counter > 2700:
+                    print("ok here")
+                    time_counter = 0
         cap.release()
             
     def stop(self):
