@@ -14,7 +14,7 @@ class Stats extends StandardPage {
   }
 
   @override
-  Widget getContentWidget() {
+  Widget getContentWidget(BuildContext context) {
     return Column(
       children: [
         // Toggle for Daily / Weekly / Monthly / Yearly breakdown.
