@@ -8,14 +8,20 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import (
-    QApplication, QLabel, QMainWindow, QPushButton, QSpacerItem, QSizePolicy, QVBoxLayout, QWidget
+    QApplication, QLabel, QMainWindow, QPushButton, QSpacerItem, QSizePolicy, 
+    QGridLayout, QHBoxLayout, QVBoxLayout, QWidget
 )
+from PySide6 import QtSql
 import numpy as np
 from collections import deque
 import logging
 import traceback
 import copy
 import scipy.signal as sp
+
+import ctypes
+myappid = u'mycompany.myproduct.subproduct.version' # arbitrary string
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 logging.basicConfig(filename='error_log.txt', level=logging.ERROR)
 # Initialize Mediapipe Pose
@@ -28,9 +34,78 @@ OVERLAP = 16
 class BravaWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Brava")
         self.centralWidget = CentralWidget()
         self.setCentralWidget(self.centralWidget)
+        
+        self.setWindowTitle("Brava")
+        self.setWindowIcon(QIcon(".//brava_symposium//brava_logo.svg"))
+
+
+class MovementCounterWidget(QWidget):
+    def __init__(self, movement):
+        super().__init__()
+        self.layout = QVBoxLayout(self)
+        self.breakdown_widget = QWidget()
+        self.breakdown_layout = QGridLayout(self.breakdown_widget)
+
+        self.count_total = 0
+        self.count_dl = 0
+        self.count_sl_r = 0
+        self.count_sl_l = 0
+
+        self.movement_label = QLabel(f"{movement} Count")
+        self.total_label = QLabel("0")
+        self.dl_label = QLabel("0")
+        self.sl_l_label = QLabel("0")
+        self.sl_r_label = QLabel("0")
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.movement_label)
+
+        self.layout.addWidget(self.movement_label)
+        self.layout.addWidget(self.total_label)
+        self.layout.addWidget(self.breakdown_widget)
+        self.breakdown_layout.addWidget(QLabel("Double Leg:"), 0, 0)
+        self.breakdown_layout.addWidget(self.dl_label, 0, 1)
+        self.breakdown_layout.addWidget(QLabel("Single Leg (L):"), 1, 0)
+        self.breakdown_layout.addWidget(self.sl_l_label, 1, 1)
+        self.breakdown_layout.addWidget(QLabel("Single Leg (R):"), 2, 0)
+        self.breakdown_layout.addWidget(self.sl_r_label, 2, 1)
+        
+    def resum_total(self):
+        self.count_total = self.count_dl + self.count_sl_r + self.count_sl_l
+
+    def add_to_count(self, dl: int=None, sl_r: int=None, sl_l: int=None):
+        """Adds the given values to the current totals."""
+        if dl is not None:
+            self.count_dl += dl
+        if sl_r is not None:
+            self.count_sl_r += sl_r
+        if sl_l is not None:
+            self.count_sl_l += sl_l
+
+        self.resum_total()
+
+    def set_count(self, dl: int=None, sl_r: int=None, sl_l: int=None):
+        """Replaces any specified totals with the given values."""
+        if dl is not None:
+            self.count_dl = dl
+        if sl_r is not None:
+            self.count_sl_r = sl_r
+        if sl_l is not None:
+            self.count_sl_l = sl_l
+        
+        self.resum_total()
+
+    def update_labels(self):
+        self.total_label.setText(str(self.count_total))
+        self.dl_label.setText(str(self.count_dl))
+        self.sl_l_label.setText(str(self.count_sl_l))
+        self.sl_r_label.setText(str(self.count_sl_r))
+
+    def reset(self):
+        self.set_count(0, 0, 0)
+        self.update_labels()
 
 
 class CentralWidget(QWidget):
@@ -39,30 +114,44 @@ class CentralWidget(QWidget):
 
         self.font = "Figtree"
 
-        self.button = QPushButton("Click me!")
+        self.run_button = QPushButton("Start Session")
         self.title_label = QLabel("Brava Demo\nLandmark Detection", alignment=Qt.AlignCenter)
-        self.feedlabel = QLabel("Video Feed Loading...", alignment=Qt.AlignCenter)
+        self.feedlabel = QLabel("Press the Start Session button to begin!", alignment=Qt.AlignCenter)
         self.feedlabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
-        # # Set Figtree font, make it bold, and increase font size
-        # font = QFont(self.font)
+        # --- Movement Counters ---
+        # Set up the widget to put the counters side-by-side in a row.
+        self.count_row_widget = QWidget()
+        self.count_row_layout = QHBoxLayout(self.count_row_widget)
+        # Releve counter.
+        self.releve_counter = MovementCounterWidget("Relevé")
+        self.releve_counter.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        # Jump counter.
+        self.jump_counter = MovementCounterWidget("Jump")
+        self.jump_counter.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        # Add the counters to the row widget.
+        self.count_row_layout.addWidget(self.releve_counter)
+        self.count_row_layout.addWidget(self.jump_counter)
+
+        # Set Figtree font, make it bold, and increase font size
         # font = QFont(self.font)
         # font.setBold(True)
-        # font.setPointSize(24)  # Increase font size to 18
+        # font.setPointSize(14)  # Increase font size to 18
         # self.title_label.setFont(font)
 
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(self.title_label)
+        self.layout.addWidget(self.run_button)
         self.layout.addWidget(self.feedlabel)
-        self.layout.addWidget(self.button)
-
-        # self.button.clicked.connect(self.magic)
+        self.layout.addWidget(self.count_row_widget)
 
         # set up the video feed
-        self.button.clicked.connect(self.CancelFeed)
         self.video_worker = CVWorker()
-        self.video_worker.start()
         self.video_worker.ImageUpdate.connect(self.ImageUpdateSlot)
+        self.video_worker.counter_update.connect(self.update_count)
+        self.feed_visible = False
+        self.run_button.clicked.connect(self.toggle_feed)
+        # self.video_worker.start()
 
     @QtCore.Slot()
     def magic(self):
@@ -70,20 +159,56 @@ class CentralWidget(QWidget):
 
     @QtCore.Slot(QImage)  # (optional) decorator to indicate what object the signal will provide.
     def ImageUpdateSlot(self, Image):
-        self.feedlabel.setPixmap(QPixmap.fromImage(Image))
+        if self.feed_visible:
+            self.feedlabel.setPixmap(QPixmap.fromImage(Image))
 
-    def CancelFeed(self):
-        print('cancel feed')
-        self.video_worker.stop()
+    @QtCore.Slot(dict)
+    def update_count(self, count_dict):
+        self.releve_counter.add_to_count(dl=count_dict["DLR"], sl_r=count_dict["SLR_R"], sl_l=count_dict["SLR_L"])
+        self.jump_counter.add_to_count(dl=count_dict["DLJ"], sl_r=count_dict["SLJ_R"], sl_l=count_dict["SLJ_L"])
+
+        self.releve_counter.update_labels()
+        self.jump_counter.update_labels()
+
+    def toggle_feed(self):
+        if self.feed_visible:
+            self.video_worker.stop()
+
+            self.feedlabel.clear()
+            self.feedlabel.setText("Press the Start Session button to begin!")
+            self.run_button.setText("Start Session")           
+        else:
+            self.releve_counter.reset()
+            self.jump_counter.reset()
+            self.feedlabel.setText("Video Feed Loading...")
+            self.video_worker.start()
+            self.run_button.setText("End Session")
+        self.feed_visible = not self.feed_visible
 
 
 # FPV thread
 class CVWorker(QThread):
+
     ImageUpdate = QtCore.Signal(QImage)
+    counter_update = QtCore.Signal(dict)
+
+    def __init__(self):
+        super().__init__()
+        self.counter_dict = {}
+    
+    def reset_counter_dict(self):
+        self.counter_dict = {
+            'DLJ': 0,
+            'SLJ_R': 0,
+            'SLJ_L': 0,
+            'DLR': 0,
+            'SLR_R': 0,
+            'SLR_L': 0
+        }
   
     def run(self):
 
-        counter_dict = {
+        self.counter_dict = {
             'DLJ': 0,
             'SLJ_R': 0,
             'SLJ_L': 0,
@@ -106,7 +231,6 @@ class CVWorker(QThread):
             'SLJ' : 0
         }
 
-
         def extract_coordinates(landmarks, landmark_name): # good
             landmark_dict = {
                 "RHip": mp_pose.PoseLandmark.RIGHT_HIP,
@@ -123,7 +247,6 @@ class CVWorker(QThread):
                 return landmark.x, landmark.y
             return None, None
 
-
         def extract_from_window(window, tag):
             """Extract the landmark coordinates from the big landmark coordinate dictionary"""
             tag_coords = window.get(tag, [])
@@ -135,9 +258,14 @@ class CVWorker(QThread):
             """Calcutes the length between two 2D points"""
             return np.sqrt(np.square(x2 - x1) + np.square(y2 - y1))
 
-        def normalize_data(data: np.ndarray, x_rhip: np.ndarray, y_rhip: np.ndarray, 
-                           x_rknee: np.ndarray, y_rknee: np.ndarray, x_lhip: np.ndarray, y_lhip: np.ndarray, 
-                           x_lknee: np.ndarray, y_lknee: np.ndarray, norm_start: bool=False):
+        def normalize_data(
+            data: np.ndarray, 
+            x_rhip: np.ndarray, y_rhip: np.ndarray, 
+            x_rknee: np.ndarray, y_rknee: np.ndarray, 
+            x_lhip: np.ndarray, y_lhip: np.ndarray, 
+            x_lknee: np.ndarray, y_lknee: np.ndarray, 
+            norm_start: bool=False
+        ):
             """Normalizes the data using the femur length at the beginning of the arrays.
             
             Note: consider altering in the future to normalize depending on the time (e.g. frame by frame).
@@ -237,9 +365,15 @@ class CVWorker(QThread):
             norm_x_lankle =         normalize_data(x_lankle,    x_rhip, y_rhip, x_rknee, y_rknee, x_lhip, y_lhip, x_lknee, y_lknee)
             norm_x_rhip =           normalize_data(x_rhip,      x_rhip, y_rhip, x_rknee, y_rknee, x_lhip, y_lhip, x_lknee, y_lknee)
             norm_x_lhip =           normalize_data(x_lhip,      x_rhip, y_rhip, x_rknee, y_rknee, x_lhip, y_lhip, x_lknee, y_lknee)
-            if (norm_y_rknee.size == 0 or norm_y_lknee.size == 0 or norm_y_rankle.size == 0 or norm_y_lankle.size == 0 or norm_y_rhip.size == 0 
-                or norm_y_lhip.size == 0 or norm_x_rknee.size == 0 or norm_x_lknee.size == 0 or norm_x_rankle.size == 0 or norm_x_lankle.size == 0 or norm_x_rhip.size == 0 or norm_x_lhip.size == 0): 
-                    return
+            if (
+                norm_y_rknee.size == 0 or norm_y_lknee.size == 0 
+                or norm_y_rankle.size == 0 or norm_y_lankle.size == 0 
+                or norm_y_rhip.size == 0 or norm_y_lhip.size == 0 
+                or norm_x_rknee.size == 0 or norm_x_lknee.size == 0 
+                or norm_x_rankle.size == 0 or norm_x_lankle.size == 0 
+                or norm_x_rhip.size == 0 or norm_x_lhip.size == 0
+            ): 
+                return
 
             # Delta hip height.
             delta_hip_height_r, max_ind_hip_height_r, min_ind_hip_height_r =    calculate_abs_diff(norm_y_rhip)
@@ -367,7 +501,7 @@ class CVWorker(QThread):
 
 
         self.ThreadActive = True       
-        cap = cv.VideoCapture(1) 
+        cap = cv.VideoCapture(0) 
 
         # Windowing variables. 
         window = {lm: [None] * WIN_LEN for lm in ["RHip", "LHip", "RKnee", "LKnee", "RAnkle", "LAnkle"]} 
@@ -406,7 +540,7 @@ class CVWorker(QThread):
                 if counter >= increment_len: 
                     prev_window = copy.deepcopy(window)
                     # print("test")
-                    algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_index, window_num)
+                    algorithm_logic(window, prev_window, self.counter_dict, indices_dict, prev_max_index, window_num)
                     for lm in window.keys():
                         points = window[lm]
                         for i in range(len(points) - 1):
@@ -436,16 +570,13 @@ class CVWorker(QThread):
                 Pic = ConvertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
                 self.ImageUpdate.emit(ConvertToQtFormat)
 
-                if time_counter > 2700:
-                                        # Reset counter_dict and indices_dict
-                    counter_dict = {
-                        'DLJ': 0,
-                        'SLJ_R': 0,
-                        'SLJ_L': 0,
-                        'DLR': 0,
-                        'SLR_R': 0,
-                        'SLR_L': 0
-                    }
+                if time_counter > 200:
+                # if time_counter > 2700:
+                    # Send signals to update
+                    self.counter_update.emit(self.counter_dict)
+
+                    # Reset counter_dict and indices_dict
+                    self.reset_counter_dict()
 
                     indices_dict = {
                         'DLJ': [],
@@ -474,14 +605,13 @@ class CVWorker(QThread):
                     print("TIMER")
                     time_counter = 0
                     # TODO clear stuff here still
-        print("DO I EVER GET HERE?>???????")
         cap.release()
 
 
             
     def stop(self):
-        print('stop feed')
-        print("DO I EVER GET HERE")
+        self.counter_update.emit(self.counter_dict)
+        self.reset_counter_dict()
         self.ThreadActive = False
         self.quit()
 
