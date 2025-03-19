@@ -81,9 +81,9 @@ class _LimitsContentState extends State<LimitsContent> {
         SizedBox(height: 8),
         Align(
           alignment: AlignmentDirectional.topCenter,
-          child: ElevatedButton(
+          child: PrimaryButton(
+            text: "Add Training Limit",
             onPressed: addNewLimitCard,
-            child: Text("Add Training Limit"),
           ),
         ),
         SizedBox(height: 8,),
