@@ -9,7 +9,7 @@ class StandardPage extends StatelessWidget {
     throw UnimplementedError();
   }
 
-  Widget getContentWidget() {
+  Widget getContentWidget(BuildContext context) {
     throw UnimplementedError();
   }
 
@@ -24,7 +24,7 @@ class StandardPage extends StatelessWidget {
           Expanded(
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: ScreenPadding.edgePadH,),
-              child: getContentWidget(),
+              child: getContentWidget(context),
             )
           ),
         ],
@@ -110,7 +110,9 @@ class SecondaryButton extends StatelessWidget {
 
 
 class SwitchWidget extends StatefulWidget {
-  const SwitchWidget({super.key});
+  const SwitchWidget({super.key, required this.onChanged});
+
+  final VoidCallback onChanged;
 
   @override
   State<SwitchWidget> createState() => _SwitchWidgetState();
@@ -139,6 +141,7 @@ class _SwitchWidgetState extends State<SwitchWidget> {
         setState(() {
           light = value;
         });
+        widget.onChanged();
       },
     );
   }

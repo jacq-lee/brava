@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:brava/style/style.dart';
-import 'screens/loading.dart';
 import 'screens/home.dart';
 import 'screens/camera.dart';
 import 'screens/stats.dart';
-import 'screens/stats2.dart';
 import 'screens/limits.dart';
 
 

@@ -104,11 +104,11 @@ class _RunSessionWidgetState extends State<RunSessionWidget> {
     return Column(
       children: [
         running
-            ? SecondaryButton(
+        ? SecondaryButton(
           text: "End Session",
           onPressed: _toggleRecording,
         )
-            : PrimaryButton(
+        : PrimaryButton(
           text: "Start Session",
           onPressed: _toggleRecording,
         ),

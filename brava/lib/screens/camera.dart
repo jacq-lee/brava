@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
 
 import 'package:brava/style/style.dart';
 import 'package:brava/widgets/widgets.dart';
@@ -13,40 +14,71 @@ class Camera extends StandardPage {
   }
 
   @override
-  Widget getContentWidget() {
+  Widget getContentWidget(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         // Video preview box.
-        VideoPreviewWidget(),
-        SizedBox(height: 48,),
-        // Connected cameras.
-        ConnectedCameraCard(deviceName: "Use Phone Camera", builtIn: true,),
-        SizedBox(height: 8,),
-        ConnectedCameraCard(deviceName: "Chantelle's iPhone", builtIn: false,),
-        // Fill the space between the connected camera and the bottom buttons.
-        Expanded(child: SizedBox(),),
-        // Add and disconnect camera buttons.
+        PreviewVideoWidget(),
+        SizedBox(height: 36,),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             PrimaryButton(text: "Add Camera", onPressed: () {}),
             Expanded(child: SizedBox(),),
             SecondaryButton(text: "Disconnect All", onPressed: () {},),
           ],
         ),
+        SizedBox(height: 24,),
+        // Connected cameras.
+        Container(
+          alignment: AlignmentDirectional.centerStart,
+          padding: EdgeInsets.only(left: 8,),
+          child: Text(
+            "Phone Connections",
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+              fontWeight: FontWeight.w600,
+            )
+          ),
+        ),
+        SizedBox(height: 8,),
+        Expanded(
+          child: ListView(
+            padding: EdgeInsets.all(0),
+            children: [
+              ConnectedCameraCard(deviceName: "Phone Camera", builtIn: false,),
+              // SizedBox(height: 8,),
+              // ConnectedCameraCard(deviceName: "Coco's iPhone", builtIn: false,),
+              // SizedBox(height: 8,),
+            ],
+          ),
+        ),
       ],
     );
   }
 }
 
+// PREVIEW VIDEO WIDGET --------------------------------------------------------
+// Box that allows viewers to toggle a camera preview ON / OFF.
+class PreviewVideoWidget extends StatefulWidget {
+  const PreviewVideoWidget({super.key});
 
-class VideoPreviewWidget extends StatelessWidget {
-  const VideoPreviewWidget({super.key});
+  @override
+  State<PreviewVideoWidget> createState() => _PreviewVideoWidgetState();
+}
+
+class _PreviewVideoWidgetState extends State<PreviewVideoWidget> {
+  bool previewOn = false;
+  final cornerRad = 10.0;
+
+  void togglePreview() {
+    setState(() {
+      previewOn = !previewOn;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    const cornerRad = 10.0;
-
     return Container(
       // Border around whole video preview widget.
       decoration: BoxDecoration(
@@ -57,10 +89,15 @@ class VideoPreviewWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           // Video previewer.
-          Stack(
+          previewOn
+          ? ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(cornerRad*0.8,),),
+            child: CameraPreviewWidget(),
+          )
+          : Stack(
             alignment: AlignmentDirectional.center,
             children: [
-              SizedBox(height: 200),
+              SizedBox(height: 200,),
               Icon(Icons.videocam_off_outlined, color: BravaColors.dirtyDuckGrey,)
             ],
           ),
@@ -68,7 +105,7 @@ class VideoPreviewWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             decoration: BoxDecoration(
-              color: BravaColors.lightestPink,
+                color: BravaColors.lightestPink,
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(cornerRad))
             ),
             child: Row(
@@ -76,14 +113,15 @@ class VideoPreviewWidget extends StatelessWidget {
                 SizedBox(
                   height: 40,
                   child: FittedBox(
-                      fit: BoxFit.fitHeight,
-                      child: SwitchWidget()
+                    fit: BoxFit.fitHeight,
+                    // child: PrimaryButton(text: "test", onPressed: togglePreview)
+                    child: SwitchWidget(onChanged: togglePreview,),
                   ),
                 ),
                 SizedBox(width: 4),
                 Text("See Preview"),
                 Expanded(child: SizedBox()),
-                Icon(Icons.fullscreen, color: BravaColors.dirtyDuckGrey),  // Make functional and enable/disable
+                // Icon(Icons.fullscreen, color: BravaColors.dirtyDuckGrey),  // Make functional and enable/disable
               ],
             ),
           ),
@@ -94,6 +132,9 @@ class VideoPreviewWidget extends StatelessWidget {
 }
 
 
+// CONNECTED CAMERA CARD WIDGET ------------------------------------------------
+// Widget that displays a camera when it's connected, and allows the user to
+// edit or disconnect.
 enum CameraMenu { rename, properties, disconnect, }
 
 class ConnectedCameraCard extends StatefulWidget {
@@ -176,5 +217,65 @@ class _ConnectedCameraCardState extends State<ConnectedCameraCard> {
         ],
       ),
     );
+  }
+}
+
+
+// CAMERA PREVIEW WIDGET -------------------------------------------------------
+// Widget for viewing a live camera preview.
+class CameraPreviewWidget extends StatefulWidget {
+  const CameraPreviewWidget({super.key});
+
+  @override
+  State<CameraPreviewWidget> createState() => _CameraPreviewWidgetState();
+}
+
+class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
+  late CameraController _controller;
+  List<CameraDescription> _cameras = [];
+  bool _isCameraInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+  }
+
+  Future<void> _initializeCamera() async {
+    try {
+      _cameras = await availableCameras();
+      if (_cameras.isNotEmpty) {
+        _controller = CameraController(_cameras[0], ResolutionPreset.max);
+        await _controller.initialize();
+        if (mounted) {
+          setState(() {
+            _isCameraInitialized = true;
+          });
+        }
+      } else {
+        print("No cameras available.");
+      }
+    } catch (e) {
+      print("Error initializing camera: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_isCameraInitialized) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isCameraInitialized) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return CameraPreview(_controller);
   }
 }

@@ -13,7 +13,7 @@ class Limits extends StandardPage {
   }
 
   @override
-  Widget getContentWidget() {
+  Widget getContentWidget(BuildContext context) {
     return LimitsContent();
   }
 }
