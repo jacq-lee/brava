@@ -69,7 +69,7 @@ class VideoPreviewWidget extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             decoration: BoxDecoration(
               color: BravaColors.lightestPink,
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(cornerRad))
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(cornerRad))
             ),
             child: Row(
               children: [
