@@ -5,6 +5,7 @@ import 'screens/home.dart';
 import 'screens/camera.dart';
 import 'screens/stats.dart';
 import 'screens/limits.dart';
+import 'screens/profile.dart';
 
 
 void main() {
@@ -39,7 +40,7 @@ class _BravaScreenState extends State<BravaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body:
-      <Widget>[Home(), Camera(), Limits(), Stats()][currentPageIndex],
+      <Widget>[Home(), Camera(), Limits(), Stats(), Profile(),][currentPageIndex],
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           setState(() {
@@ -50,11 +51,10 @@ class _BravaScreenState extends State<BravaScreen> {
         destinations: const <Widget>[
           NavigationDestination(icon: Icon(Icons.home_outlined), label: "Home"),
           NavigationDestination(icon: Icon(Icons.linked_camera_outlined), label: "Camera"),
-          NavigationDestination(icon: Icon(Icons.assignment_outlined), label: "Training"),
-          // NavigationDestination(icon: Icon(Icons.task_alt), label: "Training"),
-          // NavigationDestination(icon: Icon(Icons.rocket_launch_outlined), label: "Training"),
-          // NavigationDestination(icon: Icon(Icons.fitness_center_outlined), label: "Training"),
+          // NavigationDestination(icon: Icon(Icons.assignment_outlined), label: "Training"),
+          NavigationDestination(icon: Icon(Icons.fitness_center_outlined), label: "Training"),
           NavigationDestination(icon: Icon(Icons.insights), label: "Stats"),
+          NavigationDestination(icon: Icon(Icons.person_outline), label: "Profile")
         ],
       ),
     );
