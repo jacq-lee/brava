@@ -1,13 +1,21 @@
-# Import Modules
+from collections import deque
 import random
 import sys
+
+import cv2 as cv
+import mediapipe as mp
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import (
-    QApplication, QLabel, QMainWindow, QPushButton, QSizePolicy, QVBoxLayout, QWidget
+    QApplication, QLabel, QMainWindow, QPushButton, QSpacerItem, QSizePolicy, QVBoxLayout, QWidget
 )
-import cv2
+import numpy as np
+from collections import deque
+
+# Initialize Mediapipe Pose
+mp_pose = mp.solutions.pose
+pose = mp_pose.Pose()
 
 
 class BravaWindow(QMainWindow):
@@ -22,15 +30,22 @@ class CentralWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
+        self.font = "Figtree"
 
         self.button = QPushButton("Click me!")
-        self.text = QLabel("Hello World", alignment=Qt.AlignCenter)
+        self.title_label = QLabel("Brava Demo\nLandmark Detection", alignment=Qt.AlignCenter)
         self.feedlabel = QLabel("Video Feed Loading...", alignment=Qt.AlignCenter)
         self.feedlabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
+        # # Set Figtree font, make it bold, and increase font size
+        # font = QFont(self.font)
+        # font = QFont(self.font)
+        # font.setBold(True)
+        # font.setPointSize(24)  # Increase font size to 18
+        # self.title_label.setFont(font)
+
         self.layout = QVBoxLayout(self)
-        self.layout.addWidget(self.text)
+        self.layout.addWidget(self.title_label)
         self.layout.addWidget(self.feedlabel)
         self.layout.addWidget(self.button)
 
@@ -58,20 +73,53 @@ class CentralWidget(QWidget):
 # FPV thread
 class CVWorker(QThread):
     ImageUpdate = QtCore.Signal(QImage)
-    
+  
     def run(self):
         print('\nrun feed')
+        # Buffer to store last 30 frames
+        frame_buffer = deque(maxlen=30)
+
         self.ThreadActive = True       
-        Capture = cv2.VideoCapture(0) 
+        cap = cv.VideoCapture(0) 
 
         while self.ThreadActive:
-            ret, frame = Capture.read()
-            if ret:
-                Image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                ConvertToQtFormat = QImage(Image.data, Image.shape[1], Image.shape[0], QImage.Format_RGB888)
+            ret, frame = cap.read()
+            # frame_width = cap.get(cv.CAP_PROP_FRAME_WIDTH)  # Auto: 640.0
+            # frame_height = cap.get(cv.CAP_PROP_FRAME_HEIGHT)  # Auto: 480.0
+            
+            if ret:  # If frame is read correctly.
+                # ret = cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+                # ret = cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+                    
+                # Convert frame to RGB (MediaPipe requires RGB input)
+                rgb_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+
+                # Process the frame with MediaPipe
+                results = pose.process(rgb_frame)
+
+                # Store keypoints if pose is detected
+                if results.pose_landmarks:
+                    keypoints = []
+                    for landmark in results.pose_landmarks.landmark:
+                        x, y, z = landmark.x, landmark.y, landmark.z
+                        keypoints.append((x, y, z))
+                    
+                    # Add the keypoints of the current frame to the buffer
+                    frame_buffer.append(keypoints)
+
+                # Draw landmarks on the frame
+                if results.pose_landmarks:
+                    mp.solutions.drawing_utils.draw_landmarks(
+                        frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS
+                    )
+                    # Convert frame back to BGR after drawing landmarks
+                    rgb_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+
+                # Use frame_bgr in QImage
+                ConvertToQtFormat = QImage(rgb_frame.data, rgb_frame.shape[1], rgb_frame.shape[0], QImage.Format_RGB888)
                 Pic = ConvertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
-                self.ImageUpdate.emit(Pic)
-        Capture.release()
+                self.ImageUpdate.emit(ConvertToQtFormat)
+        cap.release()
             
     def stop(self):
         print('stop feed')
