@@ -210,7 +210,7 @@ class CVWorker(QThread):
             return peaks, neg_peaks, abs_diff
 
         def algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_index, i):
-            print(f"i = {i}")
+            # print(f"i = {i}")
             # Extract data.
             x_rknee, y_rknee =      extract_from_window(window, "RKnee")
             x_lknee, y_lknee =      extract_from_window(window, "LKnee")
@@ -336,8 +336,8 @@ class CVWorker(QThread):
                             indices_dict['SLJ_R'].pop()
             ################################### 
 
-            print(f"y_scatter_val = {y_scatter_val:.2f}")
-            print(f"x_scatter_val = {x_scatter_val:.2f}")
+            # print(f"y_scatter_val = {y_scatter_val:.2f}")
+            # print(f"x_scatter_val = {x_scatter_val:.2f}")
             ############### DLR ###############
             if y_scatter_val > 0.10 and y_scatter_val < 0.4 and x_scatter_val > 0.02 and x_scatter_val < 0.08:
                 # print(f"window {i} : maybe DLR")
@@ -380,10 +380,6 @@ class CVWorker(QThread):
         increment_len = initial_increment_len
         landmarks = {lm: [] for lm in window}
 
-        # Movement counting variables. 
-        DLJ_counter, SLJ_R_counter, SLJ_L_counter, DLR_counter, SLR_R_counter, SLR_L_counter = 0, 0, 0, 0, 0, 0
-        DLJ_indices, SLJ_R_indices, SLJ_L_indices, DLR_indices, SLR_R_indices, SLR_L_indices = [], [], [], [], [], []
-
         while self.ThreadActive:
 
             ret, frame = cap.read()
@@ -409,7 +405,7 @@ class CVWorker(QThread):
                 counter += 1
                 if counter >= increment_len: 
                     prev_window = copy.deepcopy(window)
-                    print("test")
+                    # print("test")
                     algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_index, window_num)
                     for lm in window.keys():
                         points = window[lm]
@@ -441,7 +437,41 @@ class CVWorker(QThread):
                 self.ImageUpdate.emit(ConvertToQtFormat)
 
                 if time_counter > 2700:
-                    print("ok here")
+                                        # Reset counter_dict and indices_dict
+                    counter_dict = {
+                        'DLJ': 0,
+                        'SLJ_R': 0,
+                        'SLJ_L': 0,
+                        'DLR': 0,
+                        'SLR_R': 0,
+                        'SLR_L': 0
+                    }
+
+                    indices_dict = {
+                        'DLJ': [],
+                        'SLJ_R': [],
+                        'SLJ_L': [],
+                        'DLR': [],
+                        'SLR_R': [],
+                        'SLR_L': []
+                    }
+
+                    prev_max_index = {
+                        'DLJ': 0,
+                        'SLJ': 0
+                    }
+                    # Windowing variables. 
+                    window = {lm: [None] * WIN_LEN for lm in ["RHip", "LHip", "RKnee", "LKnee", "RAnkle", "LAnkle"]} 
+                    prev_win = []
+                    counter = 0
+                    window_num = 0
+                    time_counter = 0
+                    start_index = 0
+                    initial_increment_len = 40
+                    increment_len = initial_increment_len
+                    landmarks = {lm: [] for lm in window}
+
+                    print("TIMER")
                     time_counter = 0
                     # TODO clear stuff here still
         print("DO I EVER GET HERE?>???????")
