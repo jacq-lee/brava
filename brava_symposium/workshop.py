@@ -15,7 +15,7 @@ time_counter = 0
 # DLJ_counter, SLJ_R_counter, SLJ_L_counter, DLR_counter, SLR_R_counter, SLR_L_counter = 0, 0, 0, 0, 0, 0
 # DLJ_indices, SLJ_R_indices, SLJ_L_indices, DLR_indices, SLR_R_indices, SLR_L_indices = [], [], [], [], [], []
 
-counter_dict = {
+counter_dict = { # good
     'DLJ': 0,
     'SLJ_R': 0,
     'SLJ_L': 0,
@@ -24,8 +24,8 @@ counter_dict = {
     'SLR_L': 0
 }
 
-indices_dict = {
-    'DLJ': [],
+indices_dict = { # good
+    'DLJ': [], 
     'SLJ_R': [],
     'SLJ_L': [],
     'DLR': [],
@@ -33,7 +33,7 @@ indices_dict = {
     'SLR_L': []
 }
 
-prev_max_index = {
+prev_max_index = { # good
     'DLJ': 0,
     'SLJ' : 0
 }
@@ -41,7 +41,7 @@ prev_max_index = {
 
 logging.basicConfig(filename='error_log.txt', level=logging.ERROR)
 
-def extract_coordinates(landmarks, landmark_name):
+def extract_coordinates(landmarks, landmark_name): # good 
     landmark_dict = {
         "RHip": mp_pose.PoseLandmark.RIGHT_HIP,
         "LHip": mp_pose.PoseLandmark.LEFT_HIP,
@@ -57,7 +57,7 @@ def extract_coordinates(landmarks, landmark_name):
         return landmark.x, landmark.y
     return None, None
 
-def plot_rhip(window):
+def plot_rhip(window): # dont need
     rhip_coords = window.get("RHip", [])
     frame_numbers = list(range(len(rhip_coords)))
     y_vals = [c[1] for c in rhip_coords if c is not None]
@@ -70,26 +70,28 @@ def plot_rhip(window):
     plt.title("RHip Y-Coordinate Over Frames")
     plt.legend()
 
-def extract_from_window(window, tag):
+def extract_from_window(window, tag): # good 
     """Extract the landmark coordinates from the big landmark coordinate dictionary"""
     tag_coords = window.get(tag, [])
     x = np.array([coord[0] for coord in tag_coords if coord is not None])
     y = np.array([coord[1] for coord in tag_coords if coord is not None])
     return x, y
 
-def length_cal(x1, x2, y1, y2):
+def length_cal(x1, x2, y1, y2): # good
     """Calcutes the length between two 2D points"""
     return np.sqrt(np.square(x2 - x1) + np.square(y2 - y1))
 
 
-def normalize_data(data: np.ndarray, x_rhip: np.ndarray, y_rhip: np.ndarray, x_rknee: np.ndarray, y_rknee: np.ndarray, x_lhip: np.ndarray, y_lhip: np.ndarray, x_lknee: np.ndarray, y_lknee: np.ndarray, norm_start: bool=False):
+def normalize_data(data: np.ndarray, x_rhip: np.ndarray, y_rhip: np.ndarray, x_rknee: np.ndarray, # good
+                   y_rknee: np.ndarray, x_lhip: np.ndarray, y_lhip: np.ndarray, x_lknee: np.ndarray, 
+                   y_lknee: np.ndarray, norm_start: bool=False):
     """Normalizes the data using the femur length at the beginning of the arrays.
     
     Note: consider altering in the future to normalize depending on the time (e.g. frame by frame).
     """
-    if x_rhip[0] == None or y_rhip[0] == None or x_rknee[0] == None or y_rknee[0] == None or x_lhip[0] == None or y_lhip[0] == None or x_lknee[0] == None or y_lknee[0] == None:
+    if x_rhip.size == 0 or y_rhip.size == 0 or x_rknee.size == 0 or y_rknee.size == 0 or x_lhip.size == 0 or y_lhip.size == 0 or x_lknee.size == 0 or y_lknee.size == 0:
         print("Warning: First element of landmark array is still None.")
-        return
+        return np.array([])
     femur_length_r = length_cal(x_rhip[0], y_rhip[0], x_rknee[0], y_rknee[0])
     femur_length_l = length_cal(x_lhip[0], y_lhip[0], x_lknee[0], y_lknee[0])
 
@@ -112,14 +114,16 @@ def normalize_data(data: np.ndarray, x_rhip: np.ndarray, y_rhip: np.ndarray, x_r
         data_norm = data / femur_len_avg
     return data_norm
 
-def calculate_abs_diff(data):
+def calculate_abs_diff(data): # done
+    if data.size == 0:
+        return 0, 0, 0
     """Calculate the absolute difference"""
     abs_diff = abs(np.max(data) - np.min(data))
     max_index = np.argmax(data)
     min_index = np.argmin(data)
     return abs_diff, max_index, min_index
 
-def calculate_mag_diff(data):
+def calculate_mag_diff(data): # done
     """Calculate the difference"""
     up = False
     abs_diff = abs(np.max(data) - np.min(data))
@@ -129,7 +133,7 @@ def calculate_mag_diff(data):
         up = True
     return up
 
-def calculate_angle(x1, y1, x2, y2, x3, y3):
+def calculate_angle(x1, y1, x2, y2, x3, y3): # done
     """Calculate angle between two vectors (passing in arrays of coordinates)"""
     v1 = np.column_stack((x1, y1)) - np.column_stack((x2, y2))
     v2 = np.column_stack((x3, y3)) - np.column_stack((x2, y2))
@@ -140,7 +144,7 @@ def calculate_angle(x1, y1, x2, y2, x3, y3):
     angles = np.degrees(np.arccos(cos_theta))
     return angles
 
-def calculate_peak_diff(data):
+def calculate_peak_diff(data): # done
     """DLJ Function - Calculate the difference between the maximum and minimum (peak so slope = 0)"""
     peaks, _ = sp.find_peaks(data)
     neg_peaks, _ = sp.find_peaks(-data)
@@ -152,7 +156,7 @@ def calculate_peak_diff(data):
     abs_diff = abs(np.max(data[peaks]) - np.min(data[neg_peaks]))
     return peaks, neg_peaks, abs_diff
 
-def algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_index, i):
+def algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_index, i): # DONE
     # print(f"i = {i}")
     # Extract data.
     x_rknee, y_rknee =      extract_from_window(window, "RKnee")
@@ -180,7 +184,11 @@ def algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_in
     norm_x_lankle =         normalize_data(x_lankle,    x_rhip, y_rhip, x_rknee, y_rknee, x_lhip, y_lhip, x_lknee, y_lknee)
     norm_x_rhip =           normalize_data(x_rhip,      x_rhip, y_rhip, x_rknee, y_rknee, x_lhip, y_lhip, x_lknee, y_lknee)
     norm_x_lhip =           normalize_data(x_lhip,      x_rhip, y_rhip, x_rknee, y_rknee, x_lhip, y_lhip, x_lknee, y_lknee)
-    
+    if (norm_y_rknee.size == 0 or norm_y_lknee.size == 0 or norm_y_rankle.size == 0 or norm_y_lankle.size == 0 or norm_y_rhip.size == 0 
+        or norm_y_lhip.size == 0 or norm_x_rknee.size == 0 or norm_x_lknee.size == 0 or norm_x_rankle.size == 0 or norm_x_lankle.size == 0 or norm_x_rhip.size == 0 or norm_x_lhip.size == 0): 
+            return
+
+
     # Delta hip height.
     delta_hip_height_r, max_ind_hip_height_r, min_ind_hip_height_r =    calculate_abs_diff(norm_y_rhip)
     delta_hip_height_l, max_ind_hip_height_l, min_ind_hip_height_l=     calculate_abs_diff(norm_y_lhip)
@@ -221,7 +229,7 @@ def algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_in
 
     x_scatter_val = avg_delta_hip_vel*mad_multiplier
     y_scatter_val = avg_delta_hip_height*mad_multiplier
-#################### CLASSIFICATION LOGIC ####################
+    #################### CLASSIFICATION LOGIC ####################
     ############### DLJ ###############
     if y_scatter_val > 0.7 and x_scatter_val > 0.1:
         print(f"window : maybe DLJ")
@@ -305,19 +313,6 @@ def algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_in
         if up_r and working_leg == 'r': 
             counter_dict['SLR_R'] += 1
 
-
-##############################################################
-    # print(y_rknee)
-    # print(y_lknee)
-    # print(y_rankle)
-    # print(y_lankle)
-    # print(y_rhip)
-    # print(y_lhip)
-
-    # 
-
-
-
 def make_detections():
     cap = cv2.VideoCapture(1) # Change depending on laptop 
     # Check if the camera was successfully opened
@@ -328,8 +323,8 @@ def make_detections():
     # Set up new instance of MediaPipe feed.
     try:
         with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:  # For higher confidence (accurrate detection), can increase the confidence numbers.
+            
             window = {lm: [None] * WIN_LEN for lm in ["RHip", "LHip", "RKnee", "LKnee", "RAnkle", "LAnkle"]} 
-
             prev_win = []
             counter = 0
             window_num = 0
@@ -386,7 +381,12 @@ def make_detections():
                         mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
                         mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
                     )
-                    
+                    # if time_counter > 2700:
+                    print(time_counter)
+                    if time_counter > 900:
+                        print("ok here")
+                        time_counter = 0
+
                     cv2.imshow('Mediapipe Feed', image)
 
                     if cv2.waitKey(10) & 0xFF == ord('q'):

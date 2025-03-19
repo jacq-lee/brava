@@ -83,9 +83,31 @@ class CVWorker(QThread):
   
     def run(self):
 
+        counter_dict = {
+            'DLJ': 0,
+            'SLJ_R': 0,
+            'SLJ_L': 0,
+            'DLR': 0,
+            'SLR_R': 0,
+            'SLR_L': 0
+        }
+
+        indices_dict = {
+            'DLJ': [],
+            'SLJ_R': [],
+            'SLJ_L': [],
+            'DLR': [],
+            'SLR_R': [],
+            'SLR_L': []
+        }
+
+        prev_max_index = {
+            'DLJ': 0,
+            'SLJ' : 0
+        }
 
 
-        def extract_coordinates(landmarks, landmark_name):
+        def extract_coordinates(landmarks, landmark_name): # good
             landmark_dict = {
                 "RHip": mp_pose.PoseLandmark.RIGHT_HIP,
                 "LHip": mp_pose.PoseLandmark.LEFT_HIP,
@@ -108,17 +130,21 @@ class CVWorker(QThread):
             x = np.array([coord[0] for coord in tag_coords if coord is not None])
             y = np.array([coord[1] for coord in tag_coords if coord is not None])
             return x, y
-
+        
         def length_cal(x1, x2, y1, y2):
             """Calcutes the length between two 2D points"""
             return np.sqrt(np.square(x2 - x1) + np.square(y2 - y1))
 
-
-        def normalize_data(data: np.ndarray, x_rhip: np.ndarray, y_rhip: np.ndarray, x_rknee: np.ndarray, y_rknee: np.ndarray, x_lhip: np.ndarray, y_lhip: np.ndarray, x_lknee: np.ndarray, y_lknee: np.ndarray, norm_start: bool=False):
+        def normalize_data(data: np.ndarray, x_rhip: np.ndarray, y_rhip: np.ndarray, 
+                           x_rknee: np.ndarray, y_rknee: np.ndarray, x_lhip: np.ndarray, y_lhip: np.ndarray, 
+                           x_lknee: np.ndarray, y_lknee: np.ndarray, norm_start: bool=False):
             """Normalizes the data using the femur length at the beginning of the arrays.
             
             Note: consider altering in the future to normalize depending on the time (e.g. frame by frame).
             """
+            if x_rhip.size == 0 or y_rhip.size == 0 or x_rknee.size == 0 or y_rknee.size == 0 or x_lhip.size == 0 or y_lhip.size == 0 or x_lknee.size == 0 or y_lknee.size == 0:
+                print("Warning: First element of landmark array is still None.")
+                return np.array([])
             femur_length_r = length_cal(x_rhip[0], y_rhip[0], x_rknee[0], y_rknee[0])
             femur_length_l = length_cal(x_lhip[0], y_lhip[0], x_lknee[0], y_lknee[0])
 
@@ -142,6 +168,8 @@ class CVWorker(QThread):
             return data_norm
 
         def calculate_abs_diff(data):
+            if data.size == 0:
+                return 0, 0, 0
             """Calculate the absolute difference"""
             abs_diff = abs(np.max(data) - np.min(data))
             max_index = np.argmax(data)
@@ -181,7 +209,8 @@ class CVWorker(QThread):
             abs_diff = abs(np.max(data[peaks]) - np.min(data[neg_peaks]))
             return peaks, neg_peaks, abs_diff
 
-        def algorithm_logic(window, prev_window):
+        def algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_index, i):
+            print(f"i = {i}")
             # Extract data.
             x_rknee, y_rknee =      extract_from_window(window, "RKnee")
             x_lknee, y_lknee =      extract_from_window(window, "LKnee")
@@ -190,7 +219,7 @@ class CVWorker(QThread):
             x_rhip, y_rhip =        extract_from_window(window, "RHip")
             x_lhip, y_lhip =        extract_from_window(window, "LHip")
             frame_array = np.arange(len(x_rknee))
-            print(len(frame_array))
+            # print(len(frame_array))
             # Ignore applying a filter for now!
 
             # Normalize y-coordinates.
@@ -208,7 +237,10 @@ class CVWorker(QThread):
             norm_x_lankle =         normalize_data(x_lankle,    x_rhip, y_rhip, x_rknee, y_rknee, x_lhip, y_lhip, x_lknee, y_lknee)
             norm_x_rhip =           normalize_data(x_rhip,      x_rhip, y_rhip, x_rknee, y_rknee, x_lhip, y_lhip, x_lknee, y_lknee)
             norm_x_lhip =           normalize_data(x_lhip,      x_rhip, y_rhip, x_rknee, y_rknee, x_lhip, y_lhip, x_lknee, y_lknee)
-            
+            if (norm_y_rknee.size == 0 or norm_y_lknee.size == 0 or norm_y_rankle.size == 0 or norm_y_lankle.size == 0 or norm_y_rhip.size == 0 
+                or norm_y_lhip.size == 0 or norm_x_rknee.size == 0 or norm_x_lknee.size == 0 or norm_x_rankle.size == 0 or norm_x_lankle.size == 0 or norm_x_rhip.size == 0 or norm_x_lhip.size == 0): 
+                    return
+
             # Delta hip height.
             delta_hip_height_r, max_ind_hip_height_r, min_ind_hip_height_r =    calculate_abs_diff(norm_y_rhip)
             delta_hip_height_l, max_ind_hip_height_l, min_ind_hip_height_l=     calculate_abs_diff(norm_y_lhip)
@@ -249,21 +281,22 @@ class CVWorker(QThread):
 
             x_scatter_val = avg_delta_hip_vel*mad_multiplier
             y_scatter_val = avg_delta_hip_height*mad_multiplier
-
-        #################### CLASSIFICATION LOGIC ####################
+            #################### CLASSIFICATION LOGIC ####################
             ############### DLJ ###############
             if y_scatter_val > 0.7 and x_scatter_val > 0.1:
                 print(f"window : maybe DLJ")
-                # if abs_diff_peaks > 0.7:
-                #     DLJ_counter += 1
-                #     DLJ_indices.append(i)
-                # if largest_peak >= WIN_SIZE - OVERLAP:
-                #     prev_max_index = largest_peak
-                #     DLJ_indices.append(i)
-                # elif largest_peak < OVERLAP:
-                #     if largest_peak +  (WIN_SIZE - OVERLAP) == prev_max_index:
-                #         DLJ_counter -= 1
-                #         DLJ_indices.pop()
+                if abs_diff_peaks > 0.7:
+                    counter_dict['DLJ'] += 1
+
+                    indices_dict['DLJ'].append(i)
+                if largest_peak >= WIN_LEN - OVERLAP:
+                # if WIN_LEN - OVERLAP - 2 <= largest_peak <= WIN_LEN - OVERLAP + 2:
+                    prev_max_index['DLJ'] = largest_peak
+                    indices_dict['DLJ'].append(i)
+                elif largest_peak < OVERLAP:
+                    if largest_peak +  (WIN_LEN - OVERLAP) == prev_max_index['DLJ']:
+                        counter_dict['DLJ'] -= 1
+                        indices_dict['DLJ'].pop()
             ################################### 
 
             ############### SLJ ###############
@@ -278,48 +311,59 @@ class CVWorker(QThread):
                     working_leg = "r"
                 print(f"SLJ working_leg = {working_leg}")
                 ###################
-                # if abs_diff_peaks > 0.7:
-                #     if working_leg == "l":
-                #         SLJ_L_counter += 1
-                #         SLJ_L_indices.append(i)
-                #     elif working_leg == "r":
-                #         SLJ_R_counter += 1
-                #         SLJ_R_indices.append(i)
-                # if largest_peak >= WIN_SIZE - OVERLAP:
-                #     prev_max_index = largest_peak
-                #     if working_leg == "l":
-                #         SLJ_L_indices.append(i)
-                #     elif working_leg == "r":
-                #         SLJ_R_indices.append(i)        
-                # elif largest_peak < OVERLAP:
-                #     if largest_peak +  (WIN_SIZE - OVERLAP) == prev_max_index:
-                #         if working_leg == "l":
-                #             SLJ_L_counter -= 1
-                #             SLJ_L_indices.pop()
-                #         elif working_leg == "r":
-                #             SLJ_R_counter -= 1
-                #             SLJ_R_indices.pop()
+                if abs_diff_peaks > 0.7:
+                    if working_leg == "l":
+                        counter_dict['SLJ_L'] += 1
+                        indices_dict['SLJ_L'].append(i)
+                    elif working_leg == "r":
+                        counter_dict['SLJ_R'] += 1
+                        indices_dict['SLJ_R'].append(i)
+                if largest_peak >= WIN_LEN - OVERLAP:
+                    prev_max_index['SLJ'] = largest_peak
+                    if working_leg == "l":
+                        indices_dict['SLJ_L'].append(i)
+                    elif working_leg == "r":
+                        indices_dict['SLJ_R'].append(i)        
+                elif largest_peak < OVERLAP:
+                    if largest_peak +  (WIN_LEN - OVERLAP) == prev_max_index['SLJ']:
+                        if working_leg == "l":
+                            print("popping SLJ_L")
+                            counter_dict['SLJ_L'] -= 1
+                            indices_dict['SLJ_L'].pop()
+                        elif working_leg == "r":
+                            print("popping SLJ_R")
+                            counter_dict['SLJ_R'] -= 1
+                            indices_dict['SLJ_R'].pop()
             ################################### 
 
-
+            print(f"y_scatter_val = {y_scatter_val:.2f}")
+            print(f"x_scatter_val = {x_scatter_val:.2f}")
             ############### DLR ###############
-            if y_scatter_val > 0.15 and y_scatter_val < 0.5 and x_scatter_val > 0.02 and x_scatter_val < 0.05:
+            if y_scatter_val > 0.10 and y_scatter_val < 0.4 and x_scatter_val > 0.02 and x_scatter_val < 0.08:
                 # print(f"window {i} : maybe DLR")
+                print(f"up_l = {up_l}")
+                print(f"up_r = {up_r}")
+
                 if up_l or up_r: 
-                    DLR_counter += 1
+                    counter_dict['DLR'] += 1
             ################################### 
 
-        ##############################################################
-            # print(y_rknee)
-            # print(y_lknee)
-            # print(y_rankle)
-            # print(y_lankle)
-            # print(y_rhip)
-            # print(y_lhip)
+            ############### SLR ###############
+            if y_scatter_val < -0.10 and y_scatter_val > -0.4 and x_scatter_val < -0.02 and x_scatter_val > -0.08:
+                ##### L or R #####
+                height_r_ankle = np.mean(y_rankle)
+                height_l_ankle = np.mean(y_lankle)
+                if height_l_ankle < height_r_ankle:
+                    working_leg = "l"
+                else:
+                    working_leg = "r"
+                print(f"SLR working_leg = {working_leg}")
+                ###################
 
-            # 
-
-
+                if up_l and working_leg == 'l': 
+                    counter_dict['SLR_L'] += 1
+                if up_r and working_leg == 'r': 
+                    counter_dict['SLR_R'] += 1
 
 
         self.ThreadActive = True       
@@ -329,8 +373,9 @@ class CVWorker(QThread):
         window = {lm: [None] * WIN_LEN for lm in ["RHip", "LHip", "RKnee", "LKnee", "RAnkle", "LAnkle"]} 
         prev_win = []
         counter = 0
-        start_index = 0
+        window_num = 0
         time_counter = 0
+        start_index = 0
         initial_increment_len = 40
         increment_len = initial_increment_len
         landmarks = {lm: [] for lm in window}
@@ -364,7 +409,8 @@ class CVWorker(QThread):
                 counter += 1
                 if counter >= increment_len: 
                     prev_window = copy.deepcopy(window)
-                    algorithm_logic(window, prev_window)
+                    print("test")
+                    algorithm_logic(window, prev_window, counter_dict, indices_dict, prev_max_index, window_num)
                     for lm in window.keys():
                         points = window[lm]
                         for i in range(len(points) - 1):
@@ -377,6 +423,7 @@ class CVWorker(QThread):
                         window[lm][:OVERLAP] = window[lm][-OVERLAP:]
                         window[lm][OVERLAP:] = [None] * (len(window[lm]) - OVERLAP)
                     counter = 0
+                    window_num += 1
                 time_counter += 1
                 ### END OF WINDOW LOGIC ###
 
@@ -396,10 +443,15 @@ class CVWorker(QThread):
                 if time_counter > 2700:
                     print("ok here")
                     time_counter = 0
+                    # TODO clear stuff here still
+        print("DO I EVER GET HERE?>???????")
         cap.release()
+
+
             
     def stop(self):
         print('stop feed')
+        print("DO I EVER GET HERE")
         self.ThreadActive = False
         self.quit()
 
