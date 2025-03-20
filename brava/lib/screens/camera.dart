@@ -105,8 +105,8 @@ class _PreviewVideoWidgetState extends State<PreviewVideoWidget> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             decoration: BoxDecoration(
-                color: BravaColors.lightestPink,
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(cornerRad))
+              color: BravaColors.lightestPink,
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(cornerRad))
             ),
             child: Row(
               children: [
