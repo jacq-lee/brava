@@ -281,7 +281,7 @@ class ProgressBar extends StatelessWidget {
                   borderRadius: BorderRadius.all(Radius.circular(20,),),
                 ),
                 child: LinearProgressIndicator(
-                  value: 0.76,
+                  value: 0.9,
                   color: backgroundColor,
                   valueColor: AlwaysStoppedAnimation(BravaColors.bravaPink),
                   minHeight: barHeight,
@@ -294,7 +294,7 @@ class ProgressBar extends StatelessWidget {
             Container(
               constraints: BoxConstraints(minWidth: 20,),
               child: Text(
-                "76%",
+                "90%",
                 style: Theme.of(context).textTheme.labelLarge!.copyWith(color: BravaColors.bravaPink, fontWeight: FontWeight.w900,),
               )
             ),

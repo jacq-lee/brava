@@ -29,7 +29,7 @@ class Profile extends StandardPage {
         ),
         SizedBox(height: 16,),
         Text(
-            "Anna Pavlova",
+            "Cocoa Pods",
             style: Theme.of(context).textTheme.titleLarge!.copyWith(
               fontWeight: FontWeight.w700,
               color: BravaColors.marleyBlack,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:brava/django/move_count.dart';
 import 'package:brava/style/style.dart';
 import 'package:brava/widgets/widgets.dart';
-
+import 'package:brava/widgets/notifications.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -62,12 +62,12 @@ class _TlProgressIndicatorState extends State<TlProgressIndicator> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           int dayCount = (
-            snapshot.data!.riseDoubleDay
-            + snapshot.data!.riseSingleLeftDay
-            + snapshot.data!.riseSingleRightDay
-            + snapshot.data!.jumpDoubleDay
-            + snapshot.data!.jumpSingleLeftDay
-            + snapshot.data!.jumpSingleRightDay
+              snapshot.data!.riseDoubleDay
+                  + snapshot.data!.riseSingleLeftDay
+                  + snapshot.data!.riseSingleRightDay
+                  + snapshot.data!.jumpDoubleDay
+                  + snapshot.data!.jumpSingleLeftDay
+                  + snapshot.data!.jumpSingleRightDay
           );
           int maxAvgCount = 3000;  // HARDCODED - REVISIT ----------------------
           double limitProgDay = dayCount / maxAvgCount;
@@ -122,7 +122,7 @@ class _TlProgressIndicatorState extends State<TlProgressIndicator> {
               ),
               CircularProgressIndicator(
                 constraints: BoxConstraints(minWidth: 300, minHeight: 300),
-                value: 0,
+                value: 0.9,
                 valueColor: AlwaysStoppedAnimation(BravaColors.bravaPink),
                 backgroundColor: BravaColors.lightGrey,
                 strokeWidth: 8,
@@ -131,7 +131,7 @@ class _TlProgressIndicatorState extends State<TlProgressIndicator> {
               Column(
                 children: [
                   Text(
-                    "0%",
+                    "90%",
                     textAlign: TextAlign.center,
                     style: Theme
                         .of(context)
@@ -166,9 +166,13 @@ class RunSessionWidget extends StatefulWidget {
 
 class _RunSessionWidgetState extends State<RunSessionWidget> {
   bool running = false;
+  final double trainingLimitPercentage = 0.90;
 
   void _toggleRecording() {
     setState(() {
+      if (!running && trainingLimitPercentage > 0.80) {
+        NotificationController.createTestNotification();
+      }
       running = !running;
     });
   }
@@ -273,12 +277,14 @@ class MovementCountRow extends StatelessWidget {
   }
 }
 
+
 class ReleveCounter extends StatefulWidget {
   const ReleveCounter({super.key});
 
   @override
   State<ReleveCounter> createState() => _ReleveCounterState();
 }
+
 
 class _ReleveCounterState extends State<ReleveCounter> {
   late Future<DailyCount> futureDailyCount;
@@ -308,7 +314,7 @@ class _ReleveCounterState extends State<ReleveCounter> {
             style: countStyle,
           );
         } else {
-          return Text('0', style: countStyle,);
+          return Text('142', style: countStyle,);
         }
       },
     );
@@ -351,7 +357,7 @@ class _JumpCounterState extends State<JumpCounter> {
             style: countStyle,
           );
         } else {
-          return Text('0', style: countStyle,);
+          return Text('68', style: countStyle,);
         }
       },
     );

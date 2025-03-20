@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:brava/style/style.dart';
+import 'package:brava/widgets/notifications.dart';
 import 'screens/home.dart';
 import 'screens/camera.dart';
 import 'screens/stats.dart';
@@ -8,7 +9,11 @@ import 'screens/limits.dart';
 import 'screens/profile.dart';
 
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await NotificationController.initializeLocalNotifications();
+
   runApp(const Brava());
 }
 
@@ -54,7 +59,7 @@ class _BravaScreenState extends State<BravaScreen> {
           // NavigationDestination(icon: Icon(Icons.assignment_outlined), label: "Training"),
           NavigationDestination(icon: Icon(Icons.fitness_center_outlined), label: "Training"),
           NavigationDestination(icon: Icon(Icons.insights), label: "Stats"),
-          NavigationDestination(icon: Icon(Icons.person_outline), label: "Profile")
+          NavigationDestination(icon: Icon(Icons.person_outline), label: "Profile"),
         ],
       ),
     );
