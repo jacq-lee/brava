@@ -13,11 +13,10 @@ class Limits extends StandardPage {
   }
 
   @override
-  Widget getContentWidget() {
+  Widget getContentWidget(BuildContext context) {
     return LimitsContent();
   }
 }
-
 
 class LimitsContent extends StatefulWidget {
   @override
@@ -36,14 +35,15 @@ class _LimitsContentState extends State<LimitsContent> {
 
   void addNewLimitCard() {
     setState(() {
-      limitCards.add(
-        TrainingLimitCard(
-          title: "Training Period",
-          onPercentage1Changed: (value) {},
-          onPercentage2Changed: (value) {},
-          onArchive: (card) => archiveCard(card),
-        ),
-      );
+      limitCards = List.from(limitCards)
+        ..add(
+          TrainingLimitCard(
+            title: "Training Period",
+            onPercentage1Changed: (value) {},
+            onPercentage2Changed: (value) {},
+            onArchive: (card) => archiveCard(card),
+          ),
+        );
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -59,8 +59,8 @@ class _LimitsContentState extends State<LimitsContent> {
 
   void archiveCard(Widget card) {
     setState(() {
-      limitCards.remove(card);
-      previousLimitCards.add(card);
+      limitCards = List.from(limitCards)..remove(card);
+      previousLimitCards = List.from(previousLimitCards..add(card));
     });
   }
 
@@ -87,7 +87,7 @@ class _LimitsContentState extends State<LimitsContent> {
           ),
         ),
         SizedBox(height: 8,),
-        Expanded(
+        Flexible(
           child: ListView(
             padding: const EdgeInsets.all(0),
             controller: _scrollController,
@@ -105,7 +105,7 @@ class _LimitsContentState extends State<LimitsContent> {
           ),
         ),
         SizedBox(height: 8,),
-        Expanded(
+        Flexible(
           child: ListView(
             padding: const EdgeInsets.all(0),
             children: previousLimitCards,
@@ -170,7 +170,7 @@ class TrainingLimitCard extends StatelessWidget {
                 children: [
                   SizedBox(width: 8),
                   SizedBox(
-                    width: 40,
+                    width: 50,
                     child: PercentageSelector(
                       onValueChanged: onPercentage1Changed,
                     ),
