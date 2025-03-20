@@ -11,7 +11,8 @@ from PySide6.QtWidgets import (
     QApplication, QLabel, QMainWindow, QPushButton, QSpacerItem, QSizePolicy, 
     QGridLayout, QHBoxLayout, QVBoxLayout, QWidget
 )
-from PySide6 import QtSql
+from PySide6.QtSql import QSqlDatabase, QSqlQuery
+
 import numpy as np
 from collections import deque
 import logging
@@ -19,9 +20,56 @@ import traceback
 import copy
 import scipy.signal as sp
 
-import ctypes
-myappid = u'mycompany.myproduct.subproduct.version' # arbitrary string
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+# from brava_symposium.database_interface import connect_db
+
+# import ctypes
+# myappid = u'mycompany.myproduct.subproduct.version' # arbitrary string
+# ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
+
+def sql_connect_db():
+    connection_name = "brava_connection"
+
+    # Check if the database connection already exists
+    if QSqlDatabase.contains(connection_name):
+        db = QSqlDatabase.database(connection_name)
+    else:    
+        # Otherwise, create a new connection
+        db = QSqlDatabase.addDatabase("QSQLITE", connection_name)
+        db.setDatabaseName("brava_django/brava_counter/db.sqlite3")
+
+    # Open connection if not already open.
+    if not db.isOpen():
+        try:
+            db.open()
+        except:
+            pass
+
+    print("Open: ", db.isOpen())
+
+    return db
+
+
+def sql_insert_movecounts(dlr: int, slr_r: int, slr_l: int, dlj: int, slj_r: int, slj_l: int):
+    db = sql_connect_db()
+    if db.isOpen():
+        query = QSqlQuery(db=db)
+        query.prepare(
+            """
+            INSERT INTO api_movecounter (DLJ_counter, DLR_counter, SLJ_L_counter, SLJ_R_counter, SLR_L_counter, SLR_R_counter, updated_at)
+            VALUES (:dlj, :dlr, :slj_l, :slj_r, :slr_l, :slr_r, datetime("now"));
+            """
+        )
+        query.bindValue(":dlj", dlj)
+        query.bindValue(":dlr", dlr)
+        query.bindValue(":slj_l", slj_l)
+        query.bindValue(":slj_r", slj_r)
+        query.bindValue(":slr_l", slr_l)
+        query.bindValue(":slr_r", slr_r)
+        success = query.exec()
+        print("Data Inserted: ", success)
+
+
 
 logging.basicConfig(filename='error_log.txt', level=logging.ERROR)
 # Initialize Mediapipe Pose
@@ -37,8 +85,8 @@ class BravaWindow(QMainWindow):
         self.centralWidget = CentralWidget()
         self.setCentralWidget(self.centralWidget)
         
-        self.setWindowTitle("Brava")
-        self.setWindowIcon(QIcon(".//brava_symposium//brava_logo.svg"))
+        self.setWindowTitle("Brava Algorithm Demo")
+        # self.setWindowIcon(QIcon(".//brava_symposium//brava_logo.svg"))
 
 
 class MovementCounterWidget(QWidget):
@@ -59,17 +107,36 @@ class MovementCounterWidget(QWidget):
         self.sl_l_label = QLabel("0")
         self.sl_r_label = QLabel("0")
 
+        dl_label = QLabel("Double Leg:")
+        sl_l_label = QLabel("Single Leg (L):")
+        sl_r_label = QLabel("Single Leg (R):")
+
+        font = self.movement_label.font()
+        font.setPointSize(24)
+
+        self.movement_label.setFont(font)
+        self.dl_label.setFont(font)
+        self.sl_l_label.setFont(font)
+        self.sl_r_label.setFont(font)
+
+        dl_label.setFont(font)
+        sl_l_label.setFont(font)
+        sl_r_label.setFont(font)
+
+        font.setPointSize(30)
+        self.total_label.setFont(font)
+
         layout = QVBoxLayout()
         layout.addWidget(self.movement_label)
 
         self.layout.addWidget(self.movement_label)
         self.layout.addWidget(self.total_label)
         self.layout.addWidget(self.breakdown_widget)
-        self.breakdown_layout.addWidget(QLabel("Double Leg:"), 0, 0)
+        self.breakdown_layout.addWidget(dl_label, 0, 0)
         self.breakdown_layout.addWidget(self.dl_label, 0, 1)
-        self.breakdown_layout.addWidget(QLabel("Single Leg (L):"), 1, 0)
+        self.breakdown_layout.addWidget(sl_l_label, 1, 0)
         self.breakdown_layout.addWidget(self.sl_l_label, 1, 1)
-        self.breakdown_layout.addWidget(QLabel("Single Leg (R):"), 2, 0)
+        self.breakdown_layout.addWidget(sl_r_label, 2, 0)
         self.breakdown_layout.addWidget(self.sl_r_label, 2, 1)
         
     def resum_total(self):
@@ -112,13 +179,19 @@ class CentralWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.font = "Figtree"
-
         self.run_button = QPushButton("Start Session")
-        self.title_label = QLabel("Brava Demo\nLandmark Detection", alignment=Qt.AlignCenter)
+        self.title_label = QLabel("Brava Algorithm Demo: Landmark Detection", alignment=Qt.AlignCenter)
         self.feedlabel = QLabel("Press the Start Session button to begin!", alignment=Qt.AlignCenter)
+
+        font = self.title_label.font()
+        font.setPointSize(24)
+        self.title_label.setFont(font)
+
+        font.setPointSize(20)
+        self.run_button.setFont(font)
+        self.feedlabel.setFont(font)
         
-        self.run_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
+        self.run_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.feedlabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # --- Movement Counters ---
@@ -133,6 +206,7 @@ class CentralWidget(QWidget):
         self.jump_counter.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         # Add the counters to the row widget.
         self.count_row_layout.addWidget(self.releve_counter)
+        self.count_row_layout.addWidget(self.run_button, alignment=Qt.AlignmentFlag.AlignHCenter)
         self.count_row_layout.addWidget(self.jump_counter)
 
         # Set Figtree font, make it bold, and increase font size
@@ -143,7 +217,6 @@ class CentralWidget(QWidget):
 
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(self.title_label)
-        self.layout.addWidget(self.run_button, alignment=Qt.AlignmentFlag.AlignHCenter)
         self.layout.addWidget(self.feedlabel)
         self.layout.addWidget(self.count_row_widget)
 
@@ -166,11 +239,21 @@ class CentralWidget(QWidget):
 
     @QtCore.Slot(dict)
     def update_count(self, count_dict):
-        self.releve_counter.add_to_count(dl=count_dict["DLR"], sl_r=count_dict["SLR_R"], sl_l=count_dict["SLR_L"])
-        self.jump_counter.add_to_count(dl=count_dict["DLJ"], sl_r=count_dict["SLJ_R"], sl_l=count_dict["SLJ_L"])
+        dlr = count_dict["DLR"]
+        rr = count_dict["SLR_R"]
+        rl = count_dict["SLR_L"]
+        dlj = count_dict["DLJ"]
+        jr = count_dict["SLJ_R"]
+        jl = count_dict["SLJ_L"]
+
+
+        self.releve_counter.add_to_count(dl=dlr, sl_r=rr, sl_l=rl)
+        self.jump_counter.add_to_count(dl=dlj, sl_r=jr, sl_l=jl)
 
         self.releve_counter.update_labels()
         self.jump_counter.update_labels()
+
+        sql_insert_movecounts(dlr=dlr, slr_r=rr, slr_l=rl, dlj=dlj, slj_r=jr, slj_l=jl)
 
     def toggle_feed(self):
         if self.feed_visible:
@@ -421,7 +504,7 @@ class CVWorker(QThread):
             ############### DLJ ###############
             if y_scatter_val > 0.7 and x_scatter_val > 0.1:
                 print(f"window : maybe DLJ")
-                if abs_diff_peaks > 0.7:
+                if abs_diff_peaks and abs_diff_peaks > 0.7:  # check if abs_diff_peaks is not None first.
                     counter_dict['DLJ'] += 1
 
                     indices_dict['DLJ'].append(i)
@@ -562,7 +645,9 @@ class CVWorker(QThread):
                 # Draw landmarks on the frame
                 if results.pose_landmarks:
                     mp.solutions.drawing_utils.draw_landmarks(
-                        frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS
+                        frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS, 
+                        mp.solutions.drawing_utils.DrawingSpec(color=(245, 117, 66), thickness=12, circle_radius=6),  # Blue fill
+                        mp.solutions.drawing_utils.DrawingSpec(color=(245, 66, 230), thickness=12, circle_radius=6)  
                     )
                     # Convert frame back to BGR after drawing landmarks
                     rgb_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
@@ -570,8 +655,8 @@ class CVWorker(QThread):
                 # Use frame_bgr in QImage
                 rgb_frame = cv.flip(rgb_frame, 1)  # Flip horizontally to mirror person.
                 ConvertToQtFormat = QImage(rgb_frame.data, rgb_frame.shape[1], rgb_frame.shape[0], QImage.Format_RGB888)
-                Pic = ConvertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
-                self.ImageUpdate.emit(ConvertToQtFormat)
+                Pic = ConvertToQtFormat.scaled(960, 720, Qt.KeepAspectRatio)
+                self.ImageUpdate.emit(Pic)
 
                 if time_counter > 900:
                 # if time_counter > 2700:

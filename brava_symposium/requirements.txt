@@ -1,4 +1,4 @@
-numpy==2.2.3
+numpy
 opencv-python==4.11.0.86
 PySide6==6.8.2.1
 PySide6_Addons==6.8.2.1
