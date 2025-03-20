@@ -53,8 +53,8 @@ class MovementCounterWidget(QWidget):
         self.count_sl_r = 0
         self.count_sl_l = 0
 
-        self.movement_label = QLabel(f"{movement} Count")
-        self.total_label = QLabel("0")
+        self.movement_label = QLabel(f"{movement} Count", alignment=Qt.AlignCenter)
+        self.total_label = QLabel("0", alignment=Qt.AlignCenter)
         self.dl_label = QLabel("0")
         self.sl_l_label = QLabel("0")
         self.sl_r_label = QLabel("0")
@@ -117,6 +117,8 @@ class CentralWidget(QWidget):
         self.run_button = QPushButton("Start Session")
         self.title_label = QLabel("Brava Demo\nLandmark Detection", alignment=Qt.AlignCenter)
         self.feedlabel = QLabel("Press the Start Session button to begin!", alignment=Qt.AlignCenter)
+        
+        self.run_button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         self.feedlabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # --- Movement Counters ---
@@ -141,7 +143,7 @@ class CentralWidget(QWidget):
 
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(self.title_label)
-        self.layout.addWidget(self.run_button)
+        self.layout.addWidget(self.run_button, alignment=Qt.AlignmentFlag.AlignHCenter)
         self.layout.addWidget(self.feedlabel)
         self.layout.addWidget(self.count_row_widget)
 
@@ -566,11 +568,12 @@ class CVWorker(QThread):
                     rgb_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
                 # Use frame_bgr in QImage
+                rgb_frame = cv.flip(rgb_frame, 1)  # Flip horizontally to mirror person.
                 ConvertToQtFormat = QImage(rgb_frame.data, rgb_frame.shape[1], rgb_frame.shape[0], QImage.Format_RGB888)
                 Pic = ConvertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
                 self.ImageUpdate.emit(ConvertToQtFormat)
 
-                if time_counter > 200:
+                if time_counter > 900:
                 # if time_counter > 2700:
                     # Send signals to update
                     self.counter_update.emit(self.counter_dict)
@@ -602,7 +605,7 @@ class CVWorker(QThread):
                     increment_len = initial_increment_len
                     landmarks = {lm: [] for lm in window}
 
-                    print("TIMER")
+                    print("Updating values...")
                     time_counter = 0
                     # TODO clear stuff here still
         cap.release()
